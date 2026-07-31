@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>COVIX — Create Your Account</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #06060e;
+    --surface: #0e0e1a;
+    --surface-2: #151528;
+    --surface-3: #1c1c35;
+    --primary: #7c3aed;
+    --primary-light: #a78bfa;
+    --primary-dark: #6d28d9;
+    --primary-glow: rgba(124, 58, 237, 0.3);
+    --accent: #06b6d4;
+    --accent-glow: rgba(6, 182, 212, 0.25);
+    --text: #e2e8f0;
+    --text-bright: #f8fafc;
+    --muted: #94a3b8;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --error: #ef4444;
+    --border: rgba(148, 163, 184, 0.08);
+    --border-hover: rgba(148, 163, 184, 0.18);
+    --shadow-lg: 0 25px 60px rgba(0, 0, 0, 0.7);
+    --shadow-md: 0 12px 30px rgba(0, 0, 0, 0.5);
+    --shadow-glow: 0 0 60px rgba(124, 58, 237, 0.15);
+    --radius: 24px;
+    --radius-sm: 12px;
+    --radius-xs: 8px;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html, body {
+    height: 100%;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+    background-image:
+      radial-gradient(ellipse at 15% 10%, rgba(124, 58, 237, 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 85% 90%, rgba(6, 182, 212, 0.06) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(124, 58, 237, 0.04) 0%, transparent 60%);
+  }
+
+  /* Grid pattern overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(124, 58, 237, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124, 58, 237, 0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+    -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+  }
+
+  /* Animated gradient orbs */
+  .orb {
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    filter: blur(100px);
+    opacity: 0.35;
+  }
+  .orb-1 {
+    width: 350px;
+    height: 350px;
+    background: rgba(124, 58, 237, 0.18);
+    top: -120px;
+    right: -100px;
+    animation: drift1 14s ease-in-out infinite;
+  }
+  .orb-2 {
+    width: 280px;
+    height: 280px;
+    background: rgba(6, 182, 212, 0.14);
+    bottom: -100px;
+    left: -80px;
+    animation: drift2 16s ease-in-out infinite;
+  }
+  .orb-3 {
+    width: 200px;
+    height: 200px;
+    background: rgba(124, 58, 237, 0.12);
+    top: 45%;
+    left: 55%;
+    animation: drift3 11s ease-in-out infinite;
+  }
+
+  @keyframes drift1 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(-50px, 40px) scale(1.15); }
+    66% { transform: translate(30px, -25px) scale(0.88); }
+  }
+  @keyframes drift2 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(40px, -30px) scale(1.12); }
+    66% { transform: translate(-25px, 35px) scale(0.9); }
+  }
+  @keyframes drift3 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(30px, -20px) scale(1.08); }
+  }
+
+  .main-container {
+    position: relative;
+    z-index: 1;
+    max-width: 460px;
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 36px 20px;
+  }
+
+  /* Header */
+  .brand-header {
+    text-align: center;
+    margin-bottom: 36px;
+    animation: slideUp 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .brand-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    padding: 8px 20px 8px 8px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-glow);
+  }
+  .brand-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4);
+  }
+  .brand-icon svg {
+    width: 20px;
+    height: 20px;
+    color: #fff;
+  }
+  .brand-name {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text-bright);
+    letter-spacing: -0.3px;
+  }
+
+  .brand-header h2 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--text-bright);
+    letter-spacing: -0.8px;
+    margin-bottom: 6px;
+    line-height: 1.2;
+  }
+  .brand-header h2 .highlight {
+    background: linear-gradient(135deg, var(--primary-light), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .brand-header .subtitle {
+    color: var(--muted);
+    font-size: 14.5px;
+    font-weight: 400;
+  }
+
+  /* Welcome Bonus Banner */
+  .bonus-banner {
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.12), rgba(6, 182, 212, 0.08));
+    border: 1px solid rgba(124, 58, 237, 0.2);
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: slideUp 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) 0.1s both;
+  }
+  .bonus-icon-wrap {
+    width: 44px;
+    height: 44px;
+    background: rgba(124, 58, 237, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .bonus-icon-wrap svg {
+    width: 22px;
+    height: 22px;
+    color: var(--primary-light);
+  }
+  .bonus-text h4 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--primary-light);
+    margin-bottom: 2px;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+  }
+  .bonus-text p {
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  /* Form Card */
+  .form-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 30px 24px;
+    box-shadow: var(--shadow-lg);
+    animation: slideUp 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) 0.2s both;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .field-group label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+  .input-shell {
+    position: relative;
+  }
+  .input-shell input {
+    width: 100%;
+    background: var(--surface-2);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-xs);
+    padding: 13px 16px;
+    color: var(--text-bright);
+    font-size: 14px;
+    font-family: 'Outfit', sans-serif;
+    outline: none;
+    transition: all 0.25s ease;
+    letter-spacing: 0.2px;
+  }
+  .input-shell input::placeholder {
+    color: #4a4a6a;
+  }
+  .input-shell input:focus {
+    border-color: var(--primary);
+    background: var(--surface-3);
+    box-shadow: 0 0 0 4px var(--primary-glow);
+  }
+  .input-shell input.input-error {
+    border-color: var(--error);
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.12);
+  }
+  .input-shell input.input-ok {
+    border-color: var(--success);
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.12);
+  }
+
+  .input-shell .toggle-pwd {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    color: var(--muted);
+    border-radius: 6px;
+    transition: all 0.2s;
+  }
+  .input-shell .toggle-pwd:hover {
+    color: var(--text-bright);
+    background: var(--surface-3);
+  }
+
+  .phone-row {
+    display: flex;
+    gap: 8px;
+  }
+  .phone-prefix-badge {
+    background: var(--surface-2);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-xs);
+    padding: 13px 10px;
+    font-size: 13px;
+    color: var(--muted);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    flex: none;
+    width: 62px;
+    text-align: center;
+  }
+
+  .field-hint {
+    font-size: 10.5px;
+    min-height: 14px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 500;
+  }
+  .field-hint.valid {
+    color: var(--success);
+  }
+  .field-hint.invalid {
+    color: var(--error);
+  }
+  .field-hint.checking {
+    color: var(--warning);
+  }
+
+  .strength-meter {
+    display: flex;
+    gap: 4px;
+    margin-top: 3px;
+  }
+  .strength-meter span {
+    flex: 1;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--surface-2);
+    transition: all 0.4s ease;
+  }
+
+  .ref-input {
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+
+  .agree-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px;
+    background: var(--surface-2);
+    border-radius: var(--radius-xs);
+    border: 1px solid var(--border);
+    margin-top: 2px;
+  }
+  .agree-row input {
+    margin-top: 2px;
+    accent-color: var(--primary);
+    width: 17px;
+    height: 17px;
+    flex: none;
+    cursor: pointer;
+  }
+  .agree-row label {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+    cursor: pointer;
+  }
+  .agree-row label a {
+    color: var(--primary-light);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .cta-button {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: var(--radius-xs);
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: #fff;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 30px var(--primary-glow);
+    position: relative;
+    overflow: hidden;
+    margin-top: 4px;
+    letter-spacing: 0.3px;
+  }
+  .cta-button::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent, rgba(255,255,255,0.08), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.5s ease;
+  }
+  .cta-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 45px var(--primary-glow);
+  }
+  .cta-button:hover:not(:disabled)::after {
+    transform: translateX(100%);
+  }
+  .cta-button:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+  .cta-button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+  .btn-loader {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2.5px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+  .cta-button.busy .btn-loader {
+    display: inline-block;
+  }
+  .cta-button.busy .btn-text {
+    display: none;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .signin-prompt {
+    text-align: center;
+    margin-top: 28px;
+    font-size: 13.5px;
+    color: var(--muted);
+    animation: slideUp 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) 0.3s both;
+  }
+  .signin-prompt a {
+    color: var(--primary-light);
+    text-decoration: none;
+    font-weight: 700;
+  }
+  .signin-prompt a:hover {
+    text-decoration: underline;
+  }
+
+  /* Toast */
+  .toast-zone {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: calc(100% - 32px);
+    max-width: 390px;
+  }
+  .toast-item {
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+    border-radius: var(--radius-xs);
+    font-size: 13px;
+    box-shadow: var(--shadow-lg);
+    animation: toastIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+  }
+  .toast-item.error {
+    border-left: 4px solid var(--error);
+  }
+  .toast-item.success {
+    border-left: 4px solid var(--success);
+  }
+  .toast-emoji {
+    font-size: 18px;
+    flex: none;
+  }
+
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateX(80px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  /* Success Modal */
+  .modal-shroud {
+    position: fixed;
+    inset: 0;
+    background: rgba(6, 6, 14, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 150;
+    padding: 20px;
+    animation: fadeOverlay 0.3s ease;
+  }
+  .modal-shroud.active {
+    display: flex;
+  }
+  @keyframes fadeOverlay {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .modal-dialog {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 34px 26px;
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+    box-shadow: var(--shadow-lg);
+    animation: popModal 0.45s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+  @keyframes popModal {
+    from { opacity: 0; transform: scale(0.85) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .modal-dialog .modal-icn-circle {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    margin: 0 auto 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-dialog .modal-icn-circle.ok {
+    background: rgba(16, 185, 129, 0.15);
+  }
+  .modal-dialog .modal-icn-circle.ok svg {
+    color: var(--success);
+    width: 30px;
+    height: 30px;
+  }
+  .modal-dialog h3 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--text-bright);
+    margin-bottom: 8px;
+  }
+  .modal-dialog p {
+    color: var(--muted);
+    font-size: 13.5px;
+    line-height: 1.6;
+    margin-bottom: 22px;
+  }
+  .modal-dialog .bonus-alert {
+    background: rgba(124, 58, 237, 0.1);
+    border: 1px solid rgba(124, 58, 237, 0.25);
+    border-radius: var(--radius-xs);
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: var(--primary-light);
+    font-weight: 600;
+  }
+  .modal-dialog .modal-cta {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: var(--radius-xs);
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: #fff;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .modal-dialog .modal-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 35px var(--primary-glow);
+  }
+
+  @media (max-width: 480px) {
+    .main-container {
+      padding: 24px 12px;
+    }
+    .form-panel {
+      padding: 22px 16px;
+    }
+    .brand-header h2 {
+      font-size: 26px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+<div class="toast-zone" id="toastZone"></div>
+
+<div class="main-container">
+  <!-- Header -->
+  <div class="brand-header">
+    <div class="brand-badge">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+        </svg>
+      </div>
+      <span class="brand-name">COVIX</span>
+    </div>
+    <h2>Begin your <span class="highlight">journey</span></h2>
+    <p class="subtitle">Create your account and claim your welcome bonus</p>
+  </div>
+
+  <!-- Welcome Bonus Banner -->
+  <div class="bonus-banner">
+    <div class="bonus-icon-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+      </svg>
+    </div>
+    <div class="bonus-text">
+      <h4>₦1,000 Welcome Bonus</h4>
+      <p>Credited to your deposit wallet immediately after signup</p>
+    </div>
+  </div>
+
+  <!-- Form Card -->
+  <div class="form-panel">
+    <form id="registerForm" novalidate>
+      <div class="field-group">
+        <label for="fullName">Full Name</label>
+        <div class="input-shell"><input type="text" id="fullName" placeholder="Chidi Okonkwo" autocomplete="name" required></div>
+        <div class="field-hint" id="nameHint"></div>
+      </div>
+
+      <div class="field-group">
+        <label for="username">Username</label>
+        <div class="input-shell"><input type="text" id="username" placeholder="chidiokonkwo" autocomplete="off" required></div>
+        <div class="field-hint" id="usernameHint"></div>
+      </div>
+
+      <div class="field-group">
+        <label for="phone">Phone Number</label>
+        <div class="phone-row">
+          <span class="phone-prefix-badge">+234</span>
+          <div class="input-shell" style="flex:1;"><input type="tel" id="phone" placeholder="8012345678" inputmode="numeric" maxlength="10" autocomplete="tel" required></div>
+        </div>
+        <div class="field-hint" id="phoneHint"></div>
+      </div>
+
+      <div class="field-group">
+        <label for="email">Email Address</label>
+        <div class="input-shell"><input type="email" id="email" placeholder="you@example.com" autocomplete="email" required></div>
+        <div class="field-hint" id="emailHint"></div>
+      </div>
+
+      <div class="field-group">
+        <label for="password">Password</label>
+        <div class="input-shell">
+          <input type="password" id="password" placeholder="Minimum 8 characters" autocomplete="new-password" required>
+          <button type="button" class="toggle-pwd" data-target="password" aria-label="Toggle password visibility">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div class="strength-meter" id="strengthMeter"><span></span><span></span><span></span><span></span></div>
+        <div class="field-hint" id="passwordHint"></div>
+      </div>
+
+      <div class="field-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <div class="input-shell">
+          <input type="password" id="confirmPassword" placeholder="Re-enter your password" autocomplete="new-password" required>
+          <button type="button" class="toggle-pwd" data-target="confirmPassword" aria-label="Toggle password visibility">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div class="field-hint" id="confirmHint"></div>
+      </div>
+
+      <div class="field-group">
+        <label for="referral">Referral Code <span style="text-transform:none;opacity:0.55;font-weight:400;">(optional)</span></label>
+        <div class="input-shell"><input type="text" id="referral" class="ref-input" placeholder="e.g. CVX-8K3M2P" autocomplete="off"></div>
+        <div class="field-hint" id="referralHint"></div>
+      </div>
+
+      <div class="agree-row">
+        <input type="checkbox" id="terms" required>
+        <label for="terms">I agree to Covix's <a href="#" id="termsLink">Terms of Service</a> and <a href="#" id="privacyLink">Privacy Policy</a>.</label>
+      </div>
+
+      <button type="submit" class="cta-button" id="submitBtn">
+        <span class="btn-text">Create My Account</span>
+        <span class="btn-loader"></span>
+      </button>
+    </form>
+  </div>
+
+  <div class="signin-prompt">
+    Already have an account? <a href="login.html">Sign in</a>
+  </div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal-shroud" id="successModal">
+  <div class="modal-dialog">
+    <div class="modal-icn-circle ok">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20,6 9,17 4,12"/></svg>
+    </div>
+    <h3>Welcome to Covix!</h3>
+    <p>Your account has been created successfully.</p>
+    <div class="bonus-alert">🎉 ₦1,000 welcome bonus credited to your deposit wallet!</div>
+    <button class="modal-cta" onclick="window.location.href='login.html'">Go to Login</button>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { getFirestore, doc, getDoc, setDoc, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBjANH3YIecQIuVh4KOrHSA2JSVE0MVFdw",
+    authDomain: "covix-1f7d2.firebaseapp.com",
+    projectId: "covix-1f7d2",
+    storageBucket: "covix-1f7d2.firebasestorage.app",
+    messagingSenderId: "550748233984",
+    appId: "1:550748233984:web:ff2a36a3f601731a4ad3e5"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // ── Toast System ──────────────────────────────────
+  function flashToast(msg, type = "info", dur = 4000) {
+    const zone = document.getElementById("toastZone");
+    const item = document.createElement("div");
+    item.className = `toast-item ${type}`;
+    const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+    item.innerHTML = `<span class="toast-emoji">${icons[type] || icons.info}</span>${msg}`;
+    if (zone.children.length >= 3) zone.removeChild(zone.firstChild);
+    zone.appendChild(item);
+    setTimeout(() => {
+      item.style.opacity = "0";
+      item.style.transform = "translateX(80px)";
+      item.style.transition = "all 0.3s";
+      setTimeout(() => { if (item.parentNode) item.remove(); }, 300);
+    }, dur);
+  }
+
+  // ── Password Visibility Toggle ────────────────────
+  document.querySelectorAll(".toggle-pwd[data-target]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const input = document.getElementById(btn.dataset.target);
+      const isHidden = input.type === "password";
+      input.type = isHidden ? "text" : "password";
+      btn.innerHTML = isHidden
+        ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`
+        : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+    });
+  });
+
+  // ── Prefill Referral from URL ─────────────────────
+  const urlParams = new URLSearchParams(window.location.search);
+  const refFromUrl = urlParams.get("ref");
+  if (refFromUrl) document.getElementById("referral").value = refFromUrl.toUpperCase();
+
+  // ── Element References ────────────────────────────
+  const els = {
+    fullName: document.getElementById("fullName"),
+    username: document.getElementById("username"),
+    phone: document.getElementById("phone"),
+    email: document.getElementById("email"),
+    password: document.getElementById("password"),
+    confirmPassword: document.getElementById("confirmPassword"),
+    referral: document.getElementById("referral"),
+    terms: document.getElementById("terms"),
+    submitBtn: document.getElementById("submitBtn")
+  };
+
+  function setHint(id, msg, state) {
+    const el = document.getElementById(id);
+    if (el) { el.textContent = msg; el.className = "field-hint" + (state ? " " + state : ""); }
+  }
+  function styleInput(el, state) {
+    if (el) { el.classList.remove("input-error", "input-ok"); if (state) el.classList.add(state); }
+  }
+
+  const patterns = {
+    username: /^[a-z0-9_]{3,20}$/,
+    email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+    phone: /^\d{10}$/
+  };
+
+  // ── Validators ────────────────────────────────────
+  function checkName() {
+    const v = els.fullName.value.trim();
+    const ok = v.length >= 3;
+    setHint("nameHint", ok ? "✓ Name looks good" : "Enter your full name", ok ? "valid" : "invalid");
+    styleInput(els.fullName, ok ? "input-ok" : "input-error");
+    return ok;
+  }
+  function checkPhone() {
+    const v = els.phone.value.trim();
+    const ok = patterns.phone.test(v) && v[0] !== "0";
+    setHint("phoneHint", ok ? "✓ Valid number" : "10 digits, no leading 0", ok ? "valid" : "invalid");
+    styleInput(els.phone, ok ? "input-ok" : "input-error");
+    return ok;
+  }
+  function checkEmail() {
+    const v = els.email.value.trim();
+    const ok = patterns.email.test(v);
+    setHint("emailHint", ok ? "✓ Valid email" : "Enter a valid email address", ok ? "valid" : "invalid");
+    styleInput(els.email, ok ? "input-ok" : "input-error");
+    return ok;
+  }
+
+  function passwordScore(v) {
+    let s = 0;
+    if (v.length >= 8) s++;
+    if (/[A-Z]/.test(v) && /[a-z]/.test(v)) s++;
+    if (/\d/.test(v)) s++;
+    if (/[^A-Za-z0-9]/.test(v)) s++;
+    return s;
+  }
+  function renderStrength(s) {
+    const bars = document.querySelectorAll("#strengthMeter span");
+    const colors = ["#ef4444", "#f59e0b", "#eab308", "#10b981"];
+    bars.forEach((b, i) => {
+      b.style.background = i < s ? colors[Math.max(s - 1, 0)] : "var(--surface-2)";
+      b.style.boxShadow = i < s ? `0 0 8px ${colors[Math.max(s - 1, 0)]}` : "none";
+    });
+  }
+  function checkPassword() {
+    const v = els.password.value;
+    const s = passwordScore(v);
+    renderStrength(s);
+    let msg = "", state = "";
+    if (v.length === 0) { /* silent */ }
+    else if (v.length < 8) { msg = "Minimum 8 characters required"; state = "invalid"; }
+    else if (s >= 3) { msg = "✓ Strong password"; state = "valid"; }
+    else { msg = "Add numbers or symbols for strength"; state = "checking"; }
+    setHint("passwordHint", msg, state);
+    styleInput(els.password, state === "valid" ? "input-ok" : state === "invalid" ? "input-error" : "");
+    return s >= 2 && v.length >= 8;
+  }
+  function checkConfirm() {
+    const v = els.confirmPassword.value;
+    if (v.length === 0) { setHint("confirmHint", ""); return false; }
+    const ok = v === els.password.value;
+    setHint("confirmHint", ok ? "✓ Passwords match" : "Passwords do not match", ok ? "valid" : "invalid");
+    styleInput(els.confirmPassword, ok ? "input-ok" : "input-error");
+    return ok;
+  }
+
+  // ── Attach Listeners ──────────────────────────────
+  els.fullName.addEventListener("blur", checkName);
+  els.phone.addEventListener("input", e => { e.target.value = e.target.value.replace(/\D/g, "").slice(0, 10); });
+  els.phone.addEventListener("blur", checkPhone);
+  els.email.addEventListener("blur", checkEmail);
+  els.password.addEventListener("input", () => { checkPassword(); if (els.confirmPassword.value) checkConfirm(); });
+  els.confirmPassword.addEventListener("input", checkConfirm);
+
+  // ── Username Availability Check ───────────────────
+  const uCache = {};
+  let uTimer, uAvailable = false;
+  els.username.addEventListener("input", e => {
+    e.target.value = e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, "");
+    const v = e.target.value.trim();
+    clearTimeout(uTimer);
+    uAvailable = false;
+    if (!patterns.username.test(v)) {
+      setHint("usernameHint", v.length > 0 ? "3-20 chars: letters, numbers, underscore" : "", "invalid");
+      styleInput(els.username, v.length > 0 ? "input-error" : "");
+      return;
+    }
+    if (uCache[v] !== undefined) { applyUsernameCheck(v, uCache[v]); return; }
+    setHint("usernameHint", "Checking availability…", "checking");
+    uTimer = setTimeout(async () => {
+      const snap = await getDoc(doc(db, "usernames", v));
+      uCache[v] = !snap.exists();
+      if (els.username.value.trim() === v) applyUsernameCheck(v, uCache[v]);
+    }, 600);
+  });
+  function applyUsernameCheck(v, avail) {
+    if (els.username.value.trim() !== v) return;
+    if (avail) {
+      setHint("usernameHint", "✓ Username is available", "valid");
+      styleInput(els.username, "input-ok");
+      uAvailable = true;
+    } else {
+      setHint("usernameHint", "Username is already taken", "invalid");
+      styleInput(els.username, "input-error");
+      uAvailable = false;
+    }
+  }
+
+  // ── Referral Code Generator ───────────────────────
+  function generateCode() {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    let code = "CVX-";
+    for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
+    return code;
+  }
+  async function uniqueReferralCode() {
+    for (let i = 0; i < 5; i++) {
+      const code = generateCode();
+      if (!(await getDoc(doc(db, "referralCodes", code))).exists()) return code;
+    }
+    return generateCode() + Date.now().toString(36).slice(-2).toUpperCase();
+  }
+
+  // ── Form Submission ───────────────────────────────
+  document.getElementById("registerForm").addEventListener("submit", async e => {
+    e.preventDefault();
+
+    if (!checkName() || !checkPhone() || !checkEmail() || !checkPassword() || !checkConfirm()) {
+      flashToast("Please fix the highlighted fields", "error");
+      return;
+    }
+    if (!patterns.username.test(els.username.value.trim())) {
+      flashToast("Please choose a valid username", "error");
+      return;
+    }
+    if (!uAvailable) {
+      flashToast("That username is not available", "error");
+      return;
+    }
+    if (!els.terms.checked) {
+      flashToast("You must accept the Terms of Service", "error");
+      return;
+    }
+
+    els.submitBtn.disabled = true;
+    els.submitBtn.classList.add("busy");
+
+    const username = els.username.value.trim();
+    const refCode = els.referral.value.trim().toUpperCase();
+
+    try {
+      let referrerUid = null;
+      if (refCode) {
+        const refSnap = await getDoc(doc(db, "referralCodes", refCode));
+        if (refSnap.exists()) referrerUid = refSnap.data().uid;
+      }
+
+      const cred = await createUserWithEmailAndPassword(auth, els.email.value.trim(), els.password.value);
+      const uid = cred.user.uid;
+      const myCode = await uniqueReferralCode();
+      const WELCOME_BONUS = 1000;
+
+      await Promise.all([
+        // Main user document with ₦1,000 welcome bonus in depositWallet
+        setDoc(doc(db, "users", uid), {
+          name: els.fullName.value.trim(),
+          username,
+          phone: "0" + els.phone.value.trim(),
+          email: els.email.value.trim(),
+          referralCode: myCode,
+          referredBy: referrerUid,
+          balance: 0,
+          depositWallet: WELCOME_BONUS,
+          withdrawalWallet: 0,
+          totalDeposit: WELCOME_BONUS,
+          totalInvested: 0,
+          totalEarnings: 0,
+          referralEarnings: 0,
+          firstPurchaseDone: false,
+          unlockedVipTier: 0,
+          hasPremiumPlan: false,
+          welcomeBonusClaimed: true,
+          createdAt: serverTimestamp()
+        }),
+        setDoc(doc(db, "usernames", username), { uid, referralCode: myCode }),
+        setDoc(doc(db, "referralCodes", myCode), { uid, username }),
+        // Log the welcome bonus transaction
+        setDoc(doc(db, "users", uid, "transactions", "welcome_bonus"), {
+          type: "bonus",
+          amount: WELCOME_BONUS,
+          description: "Welcome bonus",
+          wallet: "deposit",
+          timestamp: serverTimestamp()
+        })
+      ]);
+
+      // Cache session data
+      sessionStorage.setItem("covix_user_cache", JSON.stringify({
+        uid, name: els.fullName.value.trim(), username, referralCode: myCode
+      }));
+      sessionStorage.setItem("covix_show_welcome", "1");
+
+      // Show success modal
+      document.getElementById("successModal").classList.add("active");
+    } catch (err) {
+      let msg = "Registration failed. Please try again.";
+      if (err.code === "auth/email-already-in-use") msg = "This email is already registered.";
+      flashToast(msg, "error");
+      els.submitBtn.disabled = false;
+      els.submitBtn.classList.remove("busy");
+    }
+  });
+
+  // ── Terms / Privacy Links ─────────────────────────
+  document.getElementById("termsLink")?.addEventListener("click", e => {
+    e.preventDefault();
+    flashToast("Terms of Service page coming soon", "info");
+  });
+  document.getElementById("privacyLink")?.addEventListener("click", e => {
+    e.preventDefault();
+    flashToast("Privacy Policy page coming soon", "info");
+  });
+
+  console.log("⚡ Covix Registration — Ready");
+</script>
+</body>
+</html>

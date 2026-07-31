@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>COVIX — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #06060e;
+    --surface: #0e0e1a;
+    --surface-2: #151528;
+    --surface-3: #1c1c35;
+    --primary: #7c3aed;
+    --primary-light: #a78bfa;
+    --primary-dark: #6d28d9;
+    --primary-glow: rgba(124, 58, 237, 0.3);
+    --accent: #06b6d4;
+    --accent-glow: rgba(6, 182, 212, 0.25);
+    --text: #e2e8f0;
+    --text-bright: #f8fafc;
+    --muted: #94a3b8;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --error: #ef4444;
+    --border: rgba(148, 163, 184, 0.08);
+    --border-hover: rgba(148, 163, 184, 0.18);
+    --shadow-lg: 0 25px 60px rgba(0, 0, 0, 0.7);
+    --shadow-md: 0 12px 30px rgba(0, 0, 0, 0.5);
+    --shadow-glow: 0 0 60px rgba(124, 58, 237, 0.15);
+    --radius: 20px;
+    --radius-sm: 14px;
+    --radius-xs: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+    background-image:
+      radial-gradient(ellipse at 80% 5%, rgba(6, 182, 212, 0.06) 0%, transparent 50%),
+      radial-gradient(ellipse at 20% 95%, rgba(124, 58, 237, 0.07) 0%, transparent 50%);
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(124, 58, 237, 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124, 58, 237, 0.02) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+    mask-image: radial-gradient(ellipse at center, black 25%, transparent 65%);
+    -webkit-mask-image: radial-gradient(ellipse at center, black 25%, transparent 65%);
+  }
+
+  .orb {
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    filter: blur(90px);
+    opacity: 0.3;
+  }
+  .orb-1 { width: 280px; height: 280px; background: rgba(124, 58, 237, 0.14); top: -80px; right: -60px; animation: drift1 16s ease-in-out infinite; }
+  .orb-2 { width: 250px; height: 250px; background: rgba(6, 182, 212, 0.12); bottom: -80px; left: -70px; animation: drift2 18s ease-in-out infinite; }
+
+  @keyframes drift1 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(-30px, 25px) scale(1.1); }
+  }
+  @keyframes drift2 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(25px, -20px) scale(1.08); }
+  }
+
+  .dashboard-container {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 24px 16px 100px;
+    animation: fadeIn 0.5s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  /* Top Bar */
+  .top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    gap: 12px;
+  }
+  .user-greeting {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .avatar-circle {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 17px;
+    font-weight: 800;
+    color: #fff;
+    flex: none;
+    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.35);
+  }
+  .greeting-text h3 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-bright);
+  }
+  .greeting-text p {
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .logout-btn {
+    padding: 10px 18px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    color: var(--muted);
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.25s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .logout-btn:hover { border-color: var(--error); color: var(--error); background: rgba(239, 68, 68, 0.08); }
+
+  /* Wallet Cards */
+  .wallet-section {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  .wallet-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 18px 16px;
+    box-shadow: var(--shadow-md);
+    transition: transform 0.25s;
+  }
+  .wallet-card:hover { transform: translateY(-2px); }
+  .wallet-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 6px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+  .wallet-amount {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--text-bright);
+  }
+  .wallet-card.primary { border-left: 3px solid var(--primary); }
+  .wallet-card.accent { border-left: 3px solid var(--accent); }
+  .wallet-card.success { border-left: 3px solid var(--success); }
+
+  /* Quick Actions */
+  .quick-actions {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .action-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 18px 14px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s;
+    text-decoration: none;
+    color: var(--text);
+  }
+  .action-card:hover {
+    background: var(--surface-2);
+    border-color: var(--primary);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(124, 58, 237, 0.2);
+  }
+  .action-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    margin: 0 auto 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface-2);
+  }
+  .action-icon svg { width: 20px; height: 20px; }
+  .action-icon.deposit { color: var(--primary-light); background: rgba(124, 58, 237, 0.15); }
+  .action-icon.withdraw { color: var(--accent); background: rgba(6, 182, 212, 0.15); }
+  .action-icon.invest { color: var(--success); background: rgba(16, 185, 129, 0.15); }
+  .action-icon.share { color: #f59e0b; background: rgba(245, 158, 11, 0.15); }
+  .action-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  /* Stats Row */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .stat-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xs);
+    padding: 14px;
+    text-align: center;
+  }
+  .stat-value {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text-bright);
+    margin-bottom: 2px;
+  }
+  .stat-label {
+    font-size: 10.5px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+  }
+
+  /* Section Headers */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .section-header h4 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-bright);
+  }
+  .section-header a {
+    font-size: 12.5px;
+    color: var(--primary-light);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .section-header a:hover { text-decoration: underline; }
+
+  /* Investment Plans */
+  .plans-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  .plan-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 20px 16px;
+    text-align: center;
+    transition: all 0.25s;
+  }
+  .plan-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 8px 25px rgba(124, 58, 237, 0.15);
+    transform: translateY(-2px);
+  }
+  .plan-name {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-bright);
+    margin-bottom: 8px;
+  }
+  .plan-roi {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--primary-light), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 4px;
+  }
+  .plan-detail {
+    font-size: 11.5px;
+    color: var(--muted);
+    margin-bottom: 2px;
+  }
+  .plan-detail span { color: var(--text); font-weight: 600; }
+  .plan-btn {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 10px 20px;
+    background: var(--primary);
+    border: none;
+    border-radius: 50px;
+    color: #fff;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s;
+    text-decoration: none;
+  }
+  .plan-btn:hover { background: var(--primary-dark); box-shadow: 0 6px 20px var(--primary-glow); }
+
+  /* Transactions */
+  .tx-list {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+  .tx-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.2s;
+  }
+  .tx-row:last-child { border-bottom: none; }
+  .tx-row:hover { background: var(--surface-2); }
+  .tx-info { display: flex; align-items: center; gap: 12px; }
+  .tx-icon-wrap {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+  }
+  .tx-icon-wrap.deposit { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+  .tx-icon-wrap.withdraw { background: rgba(239, 68, 68, 0.12); color: var(--error); }
+  .tx-icon-wrap.bonus { background: rgba(124, 58, 237, 0.15); color: var(--primary-light); }
+  .tx-icon-wrap.invest { background: rgba(6, 182, 212, 0.15); color: var(--accent); }
+  .tx-icon-wrap svg { width: 17px; height: 17px; }
+  .tx-name { font-size: 13px; font-weight: 600; color: var(--text-bright); }
+  .tx-date { font-size: 11px; color: var(--muted); }
+  .tx-amount { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 700; }
+  .tx-amount.positive { color: var(--success); }
+  .tx-amount.negative { color: var(--error); }
+
+  /* Bottom Nav */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0 env(safe-area-inset-bottom, 10px);
+    z-index: 100;
+    box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.4);
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 6px 16px;
+    border-radius: 50px;
+    transition: all 0.25s;
+  }
+  .nav-item.active { color: var(--primary-light); }
+  .nav-item svg { width: 20px; height: 20px; }
+
+  /* Toast */
+  .toast-zone {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: calc(100% - 32px);
+    max-width: 390px;
+  }
+  .toast-item {
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+    border-radius: var(--radius-xs);
+    font-size: 13px;
+    box-shadow: var(--shadow-lg);
+    animation: toastIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+  }
+  .toast-item.error { border-left: 4px solid var(--error); }
+  .toast-item.success { border-left: 4px solid var(--success); }
+  .toast-emoji { font-size: 18px; flex: none; }
+
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateX(80px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  /* Loading Skeleton */
+  .skeleton {
+    background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface-3) 50%, var(--surface-2) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 6px;
+  }
+  @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+  @media (max-width: 768px) {
+    .wallet-section, .quick-actions, .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .plans-grid { grid-template-columns: 1fr; max-width: 400px; margin-left: auto; margin-right: auto; }
+    .wallet-amount { font-size: 20px; }
+  }
+  @media (max-width: 480px) {
+    .dashboard-container { padding: 16px 10px 90px; }
+    .wallet-section, .quick-actions, .stats-row { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .top-bar { flex-wrap: wrap; }
+    .greeting-text h3 { font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="toast-zone" id="toastZone"></div>
+
+<div class="dashboard-container">
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="user-greeting">
+      <div class="avatar-circle" id="avatarInitial">C</div>
+      <div class="greeting-text">
+        <h3 id="greetingName">Welcome</h3>
+        <p id="greetingUsername">@user</p>
+      </div>
+    </div>
+    <button class="logout-btn" id="logoutBtn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+      Logout
+    </button>
+  </div>
+
+  <!-- Wallet Cards -->
+  <div class="wallet-section">
+    <div class="wallet-card primary">
+      <div class="wallet-label">Deposit Wallet</div>
+      <div class="wallet-amount" id="depositWallet">₦0</div>
+    </div>
+    <div class="wallet-card accent">
+      <div class="wallet-label">Withdrawal Wallet</div>
+      <div class="wallet-amount" id="withdrawWallet">₦0</div>
+    </div>
+    <div class="wallet-card success">
+      <div class="wallet-label">Total Balance</div>
+      <div class="wallet-amount" id="totalBalance">₦0</div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions">
+    <a href="deposit.html" class="action-card">
+      <div class="action-icon deposit">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+      </div>
+      <div class="action-label">Deposit</div>
+    </a>
+    <a href="withdraw.html" class="action-card">
+      <div class="action-icon withdraw">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12h14"/></svg>
+      </div>
+      <div class="action-label">Withdraw</div>
+    </a>
+    <a href="invest.html" class="action-card">
+      <div class="action-icon invest">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>
+      </div>
+      <div class="action-label">Invest</div>
+    </a>
+    <a href="referral.html" class="action-card">
+      <div class="action-icon share">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      </div>
+      <div class="action-label">Referral</div>
+    </a>
+  </div>
+
+  <!-- Stats Row -->
+  <div class="stats-row">
+    <div class="stat-item">
+      <div class="stat-value" id="totalDeposited">₦0</div>
+      <div class="stat-label">Total Deposited</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" id="totalWithdrawn">₦0</div>
+      <div class="stat-label">Total Withdrawn</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" id="totalEarned">₦0</div>
+      <div class="stat-label">Total Earned</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" id="activePlans">0</div>
+      <div class="stat-label">Active Plans</div>
+    </div>
+  </div>
+
+  <!-- Investment Plans -->
+  <div class="section-header">
+    <h4>Investment Plans</h4>
+    <a href="invest.html">View All →</a>
+  </div>
+  <div class="plans-grid">
+    <div class="plan-card">
+      <div class="plan-name">Starter</div>
+      <div class="plan-roi">15%</div>
+      <div class="plan-detail">Min: <span>₦5,000</span></div>
+      <div class="plan-detail">Duration: <span>7 Days</span></div>
+      <a href="invest.html" class="plan-btn">Invest Now</a>
+    </div>
+    <div class="plan-card">
+      <div class="plan-name">Growth</div>
+      <div class="plan-roi">30%</div>
+      <div class="plan-detail">Min: <span>₦20,000</span></div>
+      <div class="plan-detail">Duration: <span>14 Days</span></div>
+      <a href="invest.html" class="plan-btn">Invest Now</a>
+    </div>
+    <div class="plan-card">
+      <div class="plan-name">Premium</div>
+      <div class="plan-roi">50%</div>
+      <div class="plan-detail">Min: <span>₦50,000</span></div>
+      <div class="plan-detail">Duration: <span>30 Days</span></div>
+      <a href="invest.html" class="plan-btn">Invest Now</a>
+    </div>
+  </div>
+
+  <!-- Recent Transactions -->
+  <div class="section-header">
+    <h4>Recent Transactions</h4>
+    <a href="transactions.html">View All →</a>
+  </div>
+  <div class="tx-list" id="txList">
+    <div class="tx-row">
+      <div class="tx-info">
+        <div class="tx-icon-wrap bonus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+        <div><div class="tx-name">Welcome Bonus</div><div class="tx-date">Loading...</div></div>
+      </div>
+      <div class="tx-amount positive">₦1,000</div>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Navigation -->
+<nav class="bottom-nav">
+  <a href="dashboard.html" class="nav-item active">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+    Home
+  </a>
+  <a href="invest.html" class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>
+    Invest
+  </a>
+  <a href="referral.html" class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17,11 19,13 23,9"/></svg>
+    Referral
+  </a>
+  <a href="profile.html" class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Profile
+  </a>
+</nav>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBjANH3YIecQIuVh4KOrHSA2JSVE0MVFdw",
+    authDomain: "covix-1f7d2.firebaseapp.com",
+    projectId: "covix-1f7d2",
+    storageBucket: "covix-1f7d2.firebasestorage.app",
+    messagingSenderId: "550748233984",
+    appId: "1:550748233984:web:ff2a36a3f601731a4ad3e5"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  function flashToast(msg, type = "info", dur = 4000) {
+    const zone = document.getElementById("toastZone");
+    const item = document.createElement("div");
+    item.className = `toast-item ${type}`;
+    const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+    item.innerHTML = `<span class="toast-emoji">${icons[type] || icons.info}</span>${msg}`;
+    if (zone.children.length >= 3) zone.removeChild(zone.firstChild);
+    zone.appendChild(item);
+    setTimeout(() => {
+      item.style.opacity = "0";
+      item.style.transform = "translateX(80px)";
+      item.style.transition = "all 0.3s";
+      setTimeout(() => { if (item.parentNode) item.remove(); }, 300);
+    }, dur);
+  }
+
+  function formatNaira(amount) {
+    return "₦" + Number(amount || 0).toLocaleString("en-NG");
+  }
+
+  // ── Auth Check & Data Load ────────────────────────
+  onAuthStateChanged(auth, async user => {
+    if (!user) {
+      window.location.href = "login.html";
+      return;
+    }
+
+    try {
+      const userSnap = await getDoc(doc(db, "users", user.uid));
+      if (!userSnap.exists()) {
+        flashToast("Account not found. Please login again.", "error");
+        await signOut(auth);
+        window.location.href = "login.html";
+        return;
+      }
+
+      const data = userSnap.data();
+      const name = data.name || "User";
+      const username = data.username || "user";
+      const depositWallet = data.depositWallet || 0;
+      const withdrawalWallet = data.withdrawalWallet || 0;
+      const totalDeposit = data.totalDeposit || 0;
+      const totalEarnings = data.totalEarnings || 0;
+      const totalInvested = data.totalInvested || 0;
+      const activePlansCount = data.activePlansCount || 0;
+      const totalWithdrawn = data.totalWithdrawn || 0;
+
+      // Update UI
+      document.getElementById("avatarInitial").textContent = name.charAt(0).toUpperCase();
+      document.getElementById("greetingName").textContent = "Hi, " + name.split(" ")[0];
+      document.getElementById("greetingUsername").textContent = "@" + username;
+      document.getElementById("depositWallet").textContent = formatNaira(depositWallet);
+      document.getElementById("withdrawWallet").textContent = formatNaira(withdrawalWallet);
+      document.getElementById("totalBalance").textContent = formatNaira(depositWallet + withdrawalWallet);
+      document.getElementById("totalDeposited").textContent = formatNaira(totalDeposit);
+      document.getElementById("totalWithdrawn").textContent = formatNaira(totalWithdrawn);
+      document.getElementById("totalEarned").textContent = formatNaira(totalEarnings);
+      document.getElementById("activePlans").textContent = activePlansCount;
+
+      // Cache session
+      sessionStorage.setItem("covix_user_cache", JSON.stringify({
+        uid: user.uid, name, username, referralCode: data.referralCode
+      }));
+
+      // Load recent transactions — single doc read, no query
+      loadRecentTransactions(user.uid);
+    } catch (err) {
+      console.error("Dashboard load error:", err);
+      flashToast("Failed to load dashboard data.", "error");
+    }
+  });
+
+  async function loadRecentTransactions(uid) {
+    const txList = document.getElementById("txList");
+    try {
+      // Fetch transactions from a single document to avoid multiple reads
+      const txSnap = await getDoc(doc(db, "users", uid, "transactions", "recent"));
+      if (!txSnap.exists()) {
+        txList.innerHTML = `<div class="tx-row" style="justify-content:center;padding:20px;"><span style="color:var(--muted);font-size:13px;">No transactions yet</span></div>`;
+        return;
+      }
+
+      const txData = txSnap.data();
+      const transactions = txData.items || [];
+
+      if (transactions.length === 0) {
+        txList.innerHTML = `<div class="tx-row" style="justify-content:center;padding:20px;"><span style="color:var(--muted);font-size:13px;">No transactions yet</span></div>`;
+        return;
+      }
+
+      // Show latest 5
+      const latest = transactions.slice(0, 5);
+      txList.innerHTML = latest.map(tx => {
+        const isCredit = tx.type === "deposit" || tx.type === "bonus" || tx.type === "earning";
+        const iconClass = tx.type === "deposit" ? "deposit" : tx.type === "withdrawal" ? "withdraw" : tx.type === "bonus" ? "bonus" : "invest";
+        const iconSvg = {
+          deposit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>',
+          withdrawal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12h14"/></svg>',
+          bonus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>',
+          invest: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>'
+        };
+        const dateStr = tx.timestamp ? new Date(tx.timestamp.seconds * 1000).toLocaleDateString("en-NG", { day: "numeric", month: "short" }) : "Recent";
+        return `
+          <div class="tx-row">
+            <div class="tx-info">
+              <div class="tx-icon-wrap ${iconClass}">${iconSvg[iconClass] || iconSvg.bonus}</div>
+              <div><div class="tx-name">${tx.description || tx.type}</div><div class="tx-date">${dateStr}</div></div>
+            </div>
+            <div class="tx-amount ${isCredit ? 'positive' : 'negative'}">${isCredit ? '+' : '-'}${formatNaira(tx.amount)}</div>
+          </div>`;
+      }).join("");
+    } catch (err) {
+      console.error("Transaction load error:", err);
+      txList.innerHTML = `<div class="tx-row" style="justify-content:center;padding:20px;"><span style="color:var(--muted);font-size:13px;">Unable to load transactions</span></div>`;
+    }
+  }
+
+  // ── Logout ─────────────────────────────────────────
+  document.getElementById("logoutBtn").addEventListener("click", async () => {
+    try {
+      await signOut(auth);
+      sessionStorage.removeItem("covix_user_cache");
+      window.location.href = "login.html";
+    } catch (err) {
+      flashToast("Logout failed. Try again.", "error");
+    }
+  });
+
+  console.log("⚡ Covix Dashboard — Ready");
+</script>
+</body>
+</html>

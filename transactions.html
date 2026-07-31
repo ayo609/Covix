@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>COVIX — Transaction History</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #030712;
+    --surface: #0a0f1a;
+    --surface-2: #111827;
+    --surface-3: #1a2332;
+    --primary: #7c3aed;
+    --primary-light: #a78bfa;
+    --primary-dark: #5b21b6;
+    --accent: #06b6d4;
+    --text: #e2e8f0;
+    --text-bright: #ffffff;
+    --muted: #6b7280;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --error: #ef4444;
+    --gold: #f59e0b;
+    --border: rgba(255, 255, 255, 0.06);
+    --shadow-card: 0 4px 32px rgba(0, 0, 0, 0.5);
+    --radius-lg: 28px;
+    --radius-md: 16px;
+    --radius-pill: 50px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  .bg-glow {
+    position: fixed; pointer-events: none; z-index: 0;
+    border-radius: 50%; filter: blur(80px); opacity: 0.2;
+  }
+  .glow-1 { width: 250px; height: 250px; background: rgba(124, 58, 237, 0.12); top: -60px; right: -50px; }
+  .glow-2 { width: 200px; height: 200px; background: rgba(6, 182, 212, 0.08); bottom: -50px; left: -40px; }
+
+  .page-container {
+    position: relative; z-index: 1;
+    max-width: 650px; margin: 0 auto;
+    padding: 24px 16px 100px;
+    animation: fadeIn 0.5s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .top-bar {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 24px;
+  }
+  .back-btn {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: var(--radius-pill); padding: 10px 18px;
+    color: var(--muted); font-size: 13px; cursor: pointer;
+    text-decoration: none; transition: all 0.25s;
+  }
+  .back-btn:hover { border-color: var(--primary); color: #fff; }
+  .page-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px; font-weight: 700; color: var(--text-bright);
+  }
+
+  /* Summary Cards */
+  .tx-summary {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 10px; margin-bottom: 20px;
+  }
+  .summary-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 14px 16px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .summary-icon {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex: none; font-size: 18px;
+  }
+  .summary-icon.credit { background: rgba(16, 185, 129, 0.15); }
+  .summary-icon.debit { background: rgba(239, 68, 68, 0.12); }
+  .summary-text .s-label {
+    font-size: 10px; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;
+  }
+  .summary-text .s-value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px; font-weight: 700; color: var(--text-bright);
+  }
+  .summary-text .s-value.green { color: var(--success); }
+  .summary-text .s-value.red { color: var(--error); }
+
+  /* Filter Tabs */
+  .filter-tabs {
+    display: flex; gap: 6px; margin-bottom: 16px;
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+  }
+  .filter-tab {
+    padding: 8px 16px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-pill);
+    font-size: 11px; font-weight: 600; color: var(--muted);
+    cursor: pointer; white-space: nowrap;
+    transition: all 0.2s;
+    font-family: 'Space Grotesk', sans-serif;
+  }
+  .filter-tab:hover { border-color: var(--primary); color: var(--text); }
+  .filter-tab.active {
+    background: rgba(124, 58, 237, 0.15);
+    border-color: var(--primary);
+    color: var(--primary-light);
+  }
+
+  /* Transaction List */
+  .tx-list { display: flex; flex-direction: column; gap: 6px; }
+  .tx-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 14px 16px;
+    display: flex; align-items: center; gap: 14px;
+    transition: all 0.2s;
+  }
+  .tx-card:hover { border-color: var(--primary); background: var(--surface-2); }
+  .tx-icon-wrap {
+    width: 42px; height: 42px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex: none;
+  }
+  .tx-icon-wrap.deposit { background: rgba(16, 185, 129, 0.12); }
+  .tx-icon-wrap.deposit svg { color: var(--success); }
+  .tx-icon-wrap.withdrawal { background: rgba(239, 68, 68, 0.1); }
+  .tx-icon-wrap.withdrawal svg { color: var(--error); }
+  .tx-icon-wrap.bonus { background: rgba(124, 58, 237, 0.12); }
+  .tx-icon-wrap.bonus svg { color: var(--primary-light); }
+  .tx-icon-wrap.earning { background: rgba(16, 185, 129, 0.1); }
+  .tx-icon-wrap.earning svg { color: var(--success); }
+  .tx-icon-wrap.invest { background: rgba(6, 182, 212, 0.12); }
+  .tx-icon-wrap.invest svg { color: var(--accent); }
+  .tx-icon-wrap.referral_bonus { background: rgba(245, 158, 11, 0.12); }
+  .tx-icon-wrap.referral_bonus svg { color: var(--gold); }
+  .tx-icon-wrap svg { width: 19px; height: 19px; }
+
+  .tx-info { flex: 1; min-width: 0; }
+  .tx-info .tx-title {
+    font-size: 13px; font-weight: 600; color: var(--text-bright);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .tx-info .tx-meta {
+    font-size: 11px; color: var(--muted); margin-top: 2px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .tx-status {
+    font-size: 9px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.4px; padding: 2px 8px; border-radius: var(--radius-pill);
+  }
+  .tx-status.completed { background: rgba(16, 185, 129, 0.12); color: var(--success); }
+  .tx-status.pending { background: rgba(245, 158, 11, 0.12); color: var(--warning); }
+  .tx-status.failed { background: rgba(239, 68, 68, 0.1); color: var(--error); }
+
+  .tx-amount-side {
+    text-align: right; flex: none;
+  }
+  .tx-amount {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px; font-weight: 700;
+  }
+  .tx-amount.credit { color: var(--success); }
+  .tx-amount.debit { color: var(--error); }
+  .tx-date {
+    font-size: 10px; color: var(--muted); margin-top: 2px;
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center; padding: 50px 20px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+  }
+  .empty-state svg { width: 48px; height: 48px; color: var(--muted); margin-bottom: 12px; }
+  .empty-state p { color: var(--muted); font-size: 13px; }
+
+  /* Loader */
+  .loader-row {
+    text-align: center; padding: 20px;
+  }
+  .loader-dot {
+    display: inline-block; width: 8px; height: 8px;
+    border-radius: 50%; background: var(--primary);
+    margin: 0 3px; animation: dotPulse 1.4s infinite ease-in-out;
+  }
+  .loader-dot:nth-child(2) { animation-delay: 0.2s; }
+  .loader-dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes dotPulse {
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+    40% { transform: scale(1); opacity: 1; }
+  }
+
+  /* Toast */
+  .toast-zone {
+    position: fixed; top: 16px; right: 16px; z-index: 200;
+    display: flex; flex-direction: column; gap: 8px;
+    width: calc(100% - 32px); max-width: 380px;
+  }
+  .toast-item {
+    background: var(--surface-3); border: 1px solid var(--border);
+    padding: 13px 15px; border-radius: var(--radius-md);
+    font-size: 12.5px; box-shadow: var(--shadow-card);
+    animation: toastSlide 0.4s ease;
+    display: flex; align-items: center; gap: 8px; font-weight: 500;
+  }
+  .toast-item.error { border-left: 4px solid var(--error); }
+  .toast-item.success { border-left: 4px solid var(--success); }
+  .toast-emoji { font-size: 16px; flex: none; }
+
+  @keyframes toastSlide {
+    from { opacity: 0; transform: translateX(80px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--surface); border-top: 1px solid var(--border);
+    display: flex; justify-content: space-around;
+    padding: 10px 0 env(safe-area-inset-bottom, 10px);
+    z-index: 100; box-shadow: 0 -5px 25px rgba(0,0,0,0.4);
+  }
+  .nav-item {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    color: var(--muted); text-decoration: none; font-size: 10px; font-weight: 600;
+    padding: 6px 16px; border-radius: 50px; transition: all 0.25s;
+  }
+  .nav-item.active { color: var(--primary-light); }
+  .nav-item svg { width: 20px; height: 20px; }
+
+  @media (max-width: 420px) {
+    .tx-summary { grid-template-columns: repeat(2, 1fr); }
+    .tx-amount { font-size: 13px; }
+    .tx-card { padding: 12px; gap: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-glow glow-1"></div>
+<div class="bg-glow glow-2"></div>
+<div class="toast-zone" id="toastZone"></div>
+
+<div class="page-container">
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <a href="dashboard.html" class="back-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>
+      Back
+    </a>
+    <span class="page-title">Transactions</span>
+  </div>
+
+  <!-- Summary -->
+  <div class="tx-summary">
+    <div class="summary-card">
+      <div class="summary-icon credit">📥</div>
+      <div class="summary-text">
+        <div class="s-label">Total Received</div>
+        <div class="s-value green" id="totalCredits">₦0</div>
+      </div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-icon debit">📤</div>
+      <div class="summary-text">
+        <div class="s-label">Total Spent</div>
+        <div class="s-value red" id="totalDebits">₦0</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Tabs -->
+  <div class="filter-tabs" id="filterTabs">
+    <div class="filter-tab active" data-filter="all">All</div>
+    <div class="filter-tab" data-filter="deposit">Deposits</div>
+    <div class="filter-tab" data-filter="withdrawal">Withdrawals</div>
+    <div class="filter-tab" data-filter="invest">Investments</div>
+    <div class="filter-tab" data-filter="earning">Earnings</div>
+    <div class="filter-tab" data-filter="bonus">Bonuses</div>
+    <div class="filter-tab" data-filter="referral_bonus">Referrals</div>
+  </div>
+
+  <!-- Transaction List -->
+  <div class="tx-list" id="txList">
+    <div class="loader-row">
+      <span class="loader-dot"></span>
+      <span class="loader-dot"></span>
+      <span class="loader-dot"></span>
+    </div>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <a href="dashboard.html" class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+    Home
+  </a>
+  <a href="invest.html" class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>
+    Invest
+  </a>
+  <a href="referral.html" class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17,11 19,13 23,9"/></svg>
+    Referral
+  </a>
+  <a href="profile.html" class="nav-item active">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Profile
+  </a>
+</nav>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBjANH3YIecQIuVh4KOrHSA2JSVE0MVFdw",
+    authDomain: "covix-1f7d2.firebaseapp.com",
+    projectId: "covix-1f7d2",
+    storageBucket: "covix-1f7d2.firebasestorage.app",
+    messagingSenderId: "550748233984",
+    appId: "1:550748233984:web:ff2a36a3f601731a4ad3e5"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  let allTransactions = [];
+  let currentFilter = "all";
+
+  function flashToast(msg, type = "info", dur = 4000) {
+    const zone = document.getElementById("toastZone");
+    const item = document.createElement("div");
+    item.className = `toast-item ${type}`;
+    const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+    item.innerHTML = `<span class="toast-emoji">${icons[type] || icons.info}</span>${msg}`;
+    if (zone.children.length >= 3) zone.removeChild(zone.firstChild);
+    zone.appendChild(item);
+    setTimeout(() => {
+      item.style.opacity = "0"; item.style.transform = "translateX(80px)";
+      item.style.transition = "all 0.3s";
+      setTimeout(() => { if (item.parentNode) item.remove(); }, 300);
+    }, dur);
+  }
+
+  function formatNaira(amount) {
+    return "₦" + Number(amount || 0).toLocaleString("en-NG");
+  }
+
+  function formatDateTime(timestamp) {
+    if (!timestamp) return { date: "Unknown", time: "" };
+    const date = new Date(timestamp.seconds ? timestamp.seconds * 1000 : timestamp);
+    return {
+      date: date.toLocaleDateString("en-NG", { day: "numeric", month: "short", year: "numeric" }),
+      time: date.toLocaleTimeString("en-NG", { hour: "2-digit", minute: "2-digit" })
+    };
+  }
+
+  function getTypeLabel(type) {
+    const labels = {
+      deposit: "Deposit",
+      withdrawal: "Withdrawal",
+      invest: "Investment Purchase",
+      earning: "Daily ROI",
+      bonus: "Bonus",
+      referral_bonus: "Referral Bonus"
+    };
+    return labels[type] || type;
+  }
+
+  function isCreditType(type) {
+    return ["deposit", "bonus", "earning", "referral_bonus"].includes(type);
+  }
+
+  function renderTransactions(filter) {
+    const list = document.getElementById("txList");
+    let filtered = allTransactions;
+
+    if (filter !== "all") {
+      filtered = allTransactions.filter(tx => tx.type === filter);
+    }
+
+    // Calculate totals
+    let totalCredits = 0, totalDebits = 0;
+    allTransactions.forEach(tx => {
+      if (isCreditType(tx.type)) totalCredits += tx.amount || 0;
+      else totalDebits += tx.amount || 0;
+    });
+    document.getElementById("totalCredits").textContent = formatNaira(totalCredits);
+    document.getElementById("totalDebits").textContent = formatNaira(totalDebits);
+
+    if (filtered.length === 0) {
+      list.innerHTML = `
+        <div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="18" rx="2" ry="2"/><line x1="6" y1="8" x2="18" y2="8"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="6" y1="16" x2="12" y2="16"/></svg>
+          <p>No ${filter === "all" ? "" : getTypeLabel(filter).toLowerCase()} transactions found</p>
+        </div>`;
+      return;
+    }
+
+    list.innerHTML = filtered.map(tx => {
+      const isCredit = isCreditType(tx.type);
+      const dt = formatDateTime(tx.timestamp);
+      const iconSvg = getIconSvg(tx.type);
+
+      return `
+        <div class="tx-card">
+          <div class="tx-icon-wrap ${tx.type}">${iconSvg}</div>
+          <div class="tx-info">
+            <div class="tx-title">${tx.description || getTypeLabel(tx.type)}</div>
+            <div class="tx-meta">
+              <span>${dt.date}</span>
+              <span>${dt.time}</span>
+              <span class="tx-status completed">Completed</span>
+            </div>
+          </div>
+          <div class="tx-amount-side">
+            <div class="tx-amount ${isCredit ? 'credit' : 'debit'}">${isCredit ? '+' : '-'}${formatNaira(tx.amount)}</div>
+            <div class="tx-date">${getTypeLabel(tx.type)}</div>
+          </div>
+        </div>`;
+    }).join("");
+  }
+
+  function getIconSvg(type) {
+    const svgs = {
+      deposit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>',
+      withdrawal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12h14"/></svg>',
+      invest: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>',
+      earning: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>',
+      bonus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>',
+      referral_bonus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>'
+    };
+    return svgs[type] || svgs.bonus;
+  }
+
+  // ── Load All Transactions ─────────────────────────
+  async function loadTransactions(uid) {
+    const list = document.getElementById("txList");
+    list.innerHTML = `
+      <div class="loader-row">
+        <span class="loader-dot"></span>
+        <span class="loader-dot"></span>
+        <span class="loader-dot"></span>
+      </div>`;
+
+    try {
+      allTransactions = [];
+
+      // 1. Load from recent cache
+      const cacheSnap = await getDoc(doc(db, "users", uid, "transactions", "recent"));
+      if (cacheSnap.exists()) {
+        const cached = cacheSnap.data().items || [];
+        allTransactions.push(...cached);
+      }
+
+      // 2. Also load individual transaction docs (welcome_bonus, investments, earnings, etc.)
+      // We scan known transaction IDs from the user document
+      const userSnap = await getDoc(doc(db, "users", uid));
+      
+      // Load welcome bonus
+      const welcomeSnap = await getDoc(doc(db, "users", uid, "transactions", "welcome_bonus"));
+      if (welcomeSnap.exists()) {
+        const wb = welcomeSnap.data();
+        // Avoid duplicate
+        const exists = allTransactions.some(tx => 
+          tx.type === "bonus" && tx.description === "Welcome Bonus" && tx.amount === wb.amount
+        );
+        if (!exists) {
+          allTransactions.push({ type: "bonus", amount: wb.amount, description: "Welcome Bonus", timestamp: wb.timestamp });
+        }
+      }
+
+      // Remove duplicates by description + timestamp + amount
+      const seen = new Set();
+      allTransactions = allTransactions.filter(tx => {
+        const key = `${tx.type}_${tx.description}_${tx.amount}_${tx.timestamp?.seconds || 0}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+
+      // Sort by timestamp (newest first)
+      allTransactions.sort((a, b) => {
+        const ta = a.timestamp?.seconds || 0;
+        const tb = b.timestamp?.seconds || 0;
+        return tb - ta;
+      });
+
+      console.log(`📋 Loaded ${allTransactions.length} transactions`);
+
+      // Render
+      renderTransactions(currentFilter);
+
+    } catch (err) {
+      console.error("Transaction load error:", err);
+      list.innerHTML = `
+        <div class="empty-state">
+          <p style="color:var(--error);">Failed to load transactions.</p>
+        </div>`;
+      flashToast("Failed to load transactions.", "error");
+    }
+  }
+
+  // ── Auth & Init ───────────────────────────────────
+  onAuthStateChanged(auth, async user => {
+    if (!user) {
+      window.location.href = "login.html";
+      return;
+    }
+    await loadTransactions(user.uid);
+  });
+
+  // ── Filter Tabs ───────────────────────────────────
+  document.getElementById("filterTabs").addEventListener("click", (e) => {
+    const tab = e.target.closest(".filter-tab");
+    if (!tab) return;
+
+    document.querySelectorAll(".filter-tab").forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    currentFilter = tab.dataset.filter;
+    renderTransactions(currentFilter);
+  });
+
+  console.log("⚡ Covix Transactions — Ready");
+</script>
+</body>
+</html>

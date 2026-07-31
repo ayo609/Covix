@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>COVIX — Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #030712;
+    --surface: #0a0f1a;
+    --surface-2: #111827;
+    --surface-3: #1a2332;
+    --primary: #7c3aed;
+    --primary-light: #a78bfa;
+    --primary-dark: #5b21b6;
+    --primary-glow: rgba(124, 58, 237, 0.35);
+    --accent: #06b6d4;
+    --accent-glow: rgba(6, 182, 212, 0.3);
+    --text: #e2e8f0;
+    --text-bright: #ffffff;
+    --muted: #6b7280;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --error: #ef4444;
+    --gold: #f59e0b;
+    --border: rgba(255, 255, 255, 0.06);
+    --shadow-card: 0 4px 32px rgba(0, 0, 0, 0.5);
+    --radius-lg: 28px;
+    --radius-md: 16px;
+    --radius-pill: 50px;
+    --radius-sm: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  .bg-glow {
+    position: fixed; pointer-events: none; z-index: 0;
+    border-radius: 50%; filter: blur(80px); opacity: 0.25;
+  }
+  .glow-1 { width: 300px; height: 300px; background: rgba(124, 58, 237, 0.15); top: -80px; right: -60px; }
+  .glow-2 { width: 250px; height: 250px; background: rgba(6, 182, 212, 0.1); bottom: -60px; left: -50px; }
+
+  .page-container {
+    position: relative; z-index: 1;
+    max-width: 700px; margin: 0 auto;
+    padding: 24px 16px 100px;
+    animation: fadeIn 0.5s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  /* Top Bar */
+  .top-bar {
+    display: flex; align-items: center; margin-bottom: 24px; gap: 12px;
+  }
+  .back-btn {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: var(--radius-pill); padding: 10px 18px;
+    color: var(--muted); font-size: 13px; cursor: pointer;
+    text-decoration: none; transition: all 0.25s;
+  }
+  .back-btn:hover { border-color: var(--primary); color: #fff; }
+  .page-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px; font-weight: 700; color: var(--text-bright);
+  }
+
+  /* Profile Header Card */
+  .profile-header {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 32px 24px;
+    margin-bottom: 20px; text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .profile-header::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 80px;
+    background: linear-gradient(180deg, rgba(124, 58, 237, 0.15), transparent);
+    pointer-events: none;
+  }
+  .profile-avatar {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 30px; font-weight: 700; color: #fff;
+    margin: 0 auto 16px;
+    box-shadow: 0 8px 30px rgba(124, 58, 237, 0.4);
+    position: relative; z-index: 1;
+  }
+  .profile-header h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px; font-weight: 700; color: var(--text-bright);
+    margin-bottom: 4px;
+  }
+  .profile-header .username {
+    font-size: 13px; color: var(--primary-light);
+    font-weight: 600; margin-bottom: 12px;
+  }
+  .profile-header .member-since {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: var(--radius-pill); padding: 6px 14px;
+    font-size: 11px; color: var(--muted); font-weight: 500;
+  }
+  .profile-header .member-since svg { width: 14px; height: 14px; }
+
+  /* Info Grid */
+  .info-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 10px; margin-bottom: 20px;
+  }
+  .info-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 16px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .info-icon {
+    width: 42px; height: 42px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex: none; font-size: 18px;
+  }
+  .info-icon.email { background: rgba(124, 58, 237, 0.15); }
+  .info-icon.phone { background: rgba(6, 182, 212, 0.15); }
+  .info-icon.code { background: rgba(245, 158, 11, 0.15); }
+  .info-icon.wallet { background: rgba(16, 185, 129, 0.15); }
+  .info-text .info-label {
+    font-size: 10px; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 3px;
+  }
+  .info-text .info-value {
+    font-size: 13px; font-weight: 600; color: var(--text-bright);
+    word-break: break-all;
+  }
+
+  /* Wallet Summary */
+  .wallet-summary {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 20px; margin-bottom: 20px;
+  }
+  .wallet-summary h4 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px; font-weight: 700; color: var(--text-bright);
+    margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+  }
+  .wallet-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+  }
+  .wallet-row:last-child { border-bottom: none; }
+  .wallet-row .w-label { font-size: 13px; color: var(--muted); }
+  .wallet-row .w-value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px; font-weight: 700; color: var(--text-bright);
+  }
+  .wallet-row .w-value.positive { color: var(--success); }
+
+  /* Account Stats */
+  .stats-mini {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 8px; margin-bottom: 20px;
+  }
+  .stat-mini-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 14px 10px; text-align: center;
+  }
+  .stat-mini-value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 16px; font-weight: 700; color: var(--text-bright);
+    margin-bottom: 3px;
+  }
+  .stat-mini-label {
+    font-size: 9.5px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.4px; font-weight: 600;
+  }
+
+  /* Menu Items */
+  .menu-section {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-md); overflow: hidden; margin-bottom: 16px;
+  }
+  .menu-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+    cursor: pointer; transition: all 0.2s; text-decoration: none; color: var(--text);
+  }
+  .menu-item:last-child { border-bottom: none; }
+  .menu-item:hover { background: var(--surface-2); }
+  .menu-item .menu-left { display: flex; align-items: center; gap: 12px; }
+  .menu-icon {
+    width: 38px; height: 38px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex: none; font-size: 16px;
+  }
+  .menu-icon.history { background: rgba(124, 58, 237, 0.15); }
+  .menu-icon.security { background: rgba(6, 182, 212, 0.15); }
+  .menu-icon.support { background: rgba(16, 185, 129, 0.15); }
+  .menu-icon.about { background: rgba(245, 158, 11, 0.15); }
+  .menu-icon.logout { background: rgba(239, 68, 68, 0.12); }
+  .menu-text .menu-title { font-size: 14px; font-weight: 600; color: var(--text-bright); }
+  .menu-text .menu-desc { font-size: 11px; color: var(--muted); }
+  .menu-arrow { color: var(--muted); }
+  .menu-item.logout-item:hover { background: rgba(239, 68, 68, 0.05); }
+  .menu-item.logout-item .menu-title { color: var(--error); }
+
+  /* Toast */
+  .toast-zone {
+    position: fixed; top: 16px; right: 16px; z-index: 200;
+    display: flex; flex-direction: column; gap: 8px;
+    width: calc(100% - 32px); max-width: 380px;
+  }
+  .toast-item {
+    background: var(--surface-3); border: 1px solid var(--border);
+    padding: 14px 16px; border-radius: var(--radius-md);
+    font-size: 13px; box-shadow: var(--shadow-card);
+    animation: toastSlide 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    display: flex; align-items: center; gap: 10px; font-weight: 500;
+  }
+  .toast-item.error { border-left: 4px solid var(--error); }
+  .toast-item.success { border-left: 4px solid var(--success); }
+  .toast-emoji { font-size: 18px; flex: none; }
+
+  @keyframes toastSlide {
+    from { opacity: 0; transform: translateX(80px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  /* Logout Modal */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(3, 7, 18, 0.9);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: none; align-items: center; justify-content: center;
+    z-index: 150; padding: 20px;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal-content {
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 32px 24px;
+    max-width: 400px; width: 100%; text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+    animation: popModal 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+  @keyframes popModal {
+    from { opacity: 0; transform: scale(0.85) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .modal-content .warn-circle {
+    width: 64px; height: 64px; border-radius: 50%;
+    margin: 0 auto 18px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(239, 68, 68, 0.12);
+  }
+  .modal-content .warn-circle svg { color: var(--error); width: 28px; height: 28px; }
+  .modal-content h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 8px;
+  }
+  .modal-content p {
+    color: var(--muted); font-size: 13.5px; line-height: 1.6; margin-bottom: 22px;
+  }
+  .modal-actions {
+    display: flex; gap: 10px;
+  }
+  .modal-btn {
+    flex: 1; padding: 13px;
+    border: none; border-radius: var(--radius-pill);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.3s;
+  }
+  .modal-btn.cancel {
+    background: var(--surface-3); color: var(--muted);
+    border: 1px solid var(--border);
+  }
+  .modal-btn.cancel:hover { border-color: #fff; color: #fff; }
+  .modal-btn.danger {
+    background: var(--error); color: #fff;
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3);
+  }
+  .modal-btn.danger:hover { background: #dc2626; }
+  .spinner-mini {
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 2.5px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+  .modal-btn.danger.loading .spinner-mini { display: inline-block; }
+  .modal-btn.danger.loading .btn-label { display: none; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Bottom Nav */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--surface); border-top: 1px solid var(--border);
+    display: flex; justify-content: space-around;
+    padding: 10px 0 env(safe-area-inset-bottom, 10px);
+    z-index: 100; box-shadow: 0 -5px 25px rgba(0,0,0,0.4);
+  }
+  .nav-item {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    color: var(--muted); text-decoration: none; font-size: 10px; font-weight: 600;
+    padding: 6px 16px; border-radius: 50px; transition: all 0.25s;
+  }
+  .nav-item.active { color: var(--primary-light); }
+  .nav-item svg { width: 20px; height: 20px; }
+
+  @media (max-width: 500px) {
+    .info-grid { grid-template-columns: 1fr; }
+    .stats-mini { grid-template-columns: repeat(2, 1fr); }
+    .profile-header { padding: 24px 16px; }
+    .profile-avatar { width: 64px; height: 64px; font-size: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-glow glow-1"></div>
+<div class="bg-glow glow-2"></div>
+<div class="toast-zone" id="toastZone"></div>
+
+<div class="page-container">
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <a href="dashboard.html" class="back-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>
+      Back
+    </a>
+    <span class="page-title">My Profile</span>
+    <div style="width:60px;"></div>
+  </div>
+
+  <!-- Profile Header -->
+  <div class="profile-header">
+    <div class="profile-avatar" id="profileAvatar">C</div>
+    <h2 id="profileName">Loading...</h2>
+    <p class="username" id="profileUsername">@username</p>
+    <div class="member-since">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span id="memberSince">Member since ...</span>
+    </div>
+  </div>
+
+  <!-- Account Stats -->
+  <div class="stats-mini">
+    <div class="stat-mini-card">
+      <div class="stat-mini-value" id="miniTotalDeposit">₦0</div>
+      <div class="stat-mini-label">Deposits</div>
+    </div>
+    <div class="stat-mini-card">
+      <div class="stat-mini-value" id="miniTotalInvested">₦0</div>
+      <div class="stat-mini-label">Invested</div>
+    </div>
+    <div class="stat-mini-card">
+      <div class="stat-mini-value" id="miniTotalEarned">₦0</div>
+      <div class="stat-mini-label">Earned</div>
+    </div>
+    <div class="stat-mini-card">
+      <div class="stat-mini-value" id="miniActivePlans">0</div>
+      <div class="stat-mini-label">Active Plans</div>
+    </div>
+  </div>
+
+  <!-- Contact Info -->
+  <div class="info-grid">
+    <div class="info-card">
+      <div class="info-icon email">📧</div>
+      <div class="info-text">
+        <div class="info-label">Email Address</div>
+        <div class="info-value" id="infoEmail">...</div>
+      </div>
+    </div>
+    <div class="info-card">
+      <div class="info-icon phone">📱</div>
+      <div class="info-text">
+        <div class="info-label">Phone Number</div>
+        <div class="info-value" id="infoPhone">...</div>
+      </div>
+    </div>
+    <div class="info-card">
+      <div class="info-icon code">🏷️</div>
+      <div class="info-text">
+        <div class="info-label">Referral Code</div>
+        <div class="info-value" id="infoRefCode" style="font-family:'Space Grotesk',sans-serif;letter-spacing:1px;">...</div>
+      </div>
+    </div>
+    <div class="info-card">
+      <div class="info-icon wallet">💳</div>
+      <div class="info-text">
+        <div class="info-label">Total Balance</div>
+        <div class="info-value" id="infoTotalBalance" style="color:var(--success);">₦0</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Wallet Breakdown -->
+  <div class="wallet-summary">
+    <h4>💼 Wallet Breakdown</h4>
+    <div class="wallet-row">
+      <span class="w-label">Deposit Wallet</span>
+      <span class="w-value" id="wDeposit">₦0</span>
+    </div>
+    <div class="wallet-row">
+      <span class="w-label">Withdrawal Wallet</span>
+      <span class="w-value positive" id="wWithdraw">₦0</span>
+    </div>
+    <div class="wallet-row">
+      <span class="w-label">Referral Earnings</span>
+      <span class="w-value" id="wReferral" style="color:var(--gold);">₦0</span>
+    </div>
+  </div>
+
+  <!-- Menu -->
+  <div class="menu-section">
+    <a href="transactions.html" class="menu-item">
+      <div class="menu-left">
+        <div class="menu-icon history">📋</div>
+        <div class="menu-text">
+          <div class="menu-title">Transaction History</div>
+          <div class="menu-desc">View all deposits, withdrawals & earnings</div>
+        </div>
+      </div>
+      <span class="menu-arrow">→</span>
+    </a>
+    <div class="menu-item" id="securityMenu">
+      <div class="menu-left">
+        <div class="menu-icon security">🔒</div>
+        <div class="menu-text">
+          <div class="menu-title">Security</div>
+          <div class="menu-desc">Change password & account protection</div>
+        </div>
+      </div>
+      <span class="menu-arrow">→</span>
+    </div>
+    <a href="referral.html" class="menu-item">
+      <div class="menu-left">
+        <div class="menu-icon support">👥</div>
+        <div class="menu-text">
+          <div class="menu-title">My Referrals</div>
+          <div class="menu-desc">Manage your referral network</div>
+        </div>
+      </div>
+      <span class="menu-arrow">→</span>
+    </div>
+    <div class="menu-item" id="aboutMenu">
+      <div class="menu-left">
+        <div class="menu-icon about">ℹ️</div>
+        <div class="menu-text">
+          <div class="menu-title">About Covix</div>
+          <div class="menu-desc">Version 1.0 • Terms & Policies</div>
+        </div>
+      </div>
+      <span class="menu-arrow">→</span>
+    </div>
+  </div>
+
+  <!-- Logout -->
+  <div class="menu-section">
+    <div class="menu-item logout-item" id="logoutTrigger">
+      <div class="menu-left">
+        <div class="menu-icon logout">🚪</div>
+        <div class="menu-text">
+          <div class="menu-title">Logout</div>
+          <div class="menu-desc">Sign out of your account</div>
+        </div>
+      </div>
+      <span class="menu-arrow">→</span>
+    </div>
+  </div>
+</div>
+
+<!-- Logout Confirmation Modal -->
+<div class="modal-overlay" id="logoutModal">
+  <div class="modal-content">
+    <div class="warn-circle">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+    </div>
+    <h3>Confirm Logout</h3>
+    <p>Are you sure you want to sign out? You'll need to login again to access your account.</p>
+    <div class="modal-actions">
+      <button class="modal-btn cancel" id="cancelLogout">Cancel</button>
+      <button class="modal-btn danger" id="confirmLogout">
+        <span class="btn-label">Yes, Logout</span>
+        <span class="spinner-mini"></span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Navigation -->
+<nav class="bottom-nav">
+  <a href="dashboard.html" class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+    Home
+  </a>
+  <a href="invest.html" class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>
+    Invest
+  </a>
+  <a href="referral.html" class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17,11 19,13 23,9"/></svg>
+    Referral
+  </a>
+  <a href="profile.html" class="nav-item active">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Profile
+  </a>
+</nav>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBjANH3YIecQIuVh4KOrHSA2JSVE0MVFdw",
+    authDomain: "covix-1f7d2.firebaseapp.com",
+    projectId: "covix-1f7d2",
+    storageBucket: "covix-1f7d2.firebasestorage.app",
+    messagingSenderId: "550748233984",
+    appId: "1:550748233984:web:ff2a36a3f601731a4ad3e5"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  function flashToast(msg, type = "info", dur = 4000) {
+    const zone = document.getElementById("toastZone");
+    const item = document.createElement("div");
+    item.className = `toast-item ${type}`;
+    const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+    item.innerHTML = `<span class="toast-emoji">${icons[type] || icons.info}</span>${msg}`;
+    if (zone.children.length >= 3) zone.removeChild(zone.firstChild);
+    zone.appendChild(item);
+    setTimeout(() => {
+      item.style.opacity = "0"; item.style.transform = "translateX(80px)";
+      item.style.transition = "all 0.3s";
+      setTimeout(() => { if (item.parentNode) item.remove(); }, 300);
+    }, dur);
+  }
+
+  function formatNaira(amount) {
+    return "₦" + Number(amount || 0).toLocaleString("en-NG");
+  }
+
+  function formatDateFull(timestamp) {
+    if (!timestamp) return "Unknown";
+    const date = new Date(timestamp.seconds * 1000);
+    return date.toLocaleDateString("en-NG", { day: "numeric", month: "long", year: "numeric" });
+  }
+
+  // ── Load Profile Data ─────────────────────────────
+  async function loadProfile(uid) {
+    try {
+      const userSnap = await getDoc(doc(db, "users", uid));
+      if (!userSnap.exists()) {
+        flashToast("Account not found.", "error");
+        return;
+      }
+
+      const data = userSnap.data();
+      const name = data.name || "User";
+      const username = data.username || "user";
+      const email = data.email || "N/A";
+      const phone = data.phone || "N/A";
+      const referralCode = data.referralCode || "CVX-XXXXXX";
+      const depositWallet = data.depositWallet || 0;
+      const withdrawalWallet = data.withdrawalWallet || 0;
+      const totalDeposit = data.totalDeposit || 0;
+      const totalInvested = data.totalInvested || 0;
+      const totalEarnings = data.totalEarnings || 0;
+      const referralEarnings = data.referralEarnings || 0;
+      const activePlansCount = data.activePlansCount || 0;
+      const createdAt = data.createdAt || null;
+      const totalBalance = depositWallet + withdrawalWallet;
+
+      // Update UI
+      document.getElementById("profileAvatar").textContent = name.charAt(0).toUpperCase();
+      document.getElementById("profileName").textContent = name;
+      document.getElementById("profileUsername").textContent = "@" + username;
+      document.getElementById("memberSince").textContent = "Member since " + formatDateFull(createdAt);
+      document.getElementById("infoEmail").textContent = email;
+      document.getElementById("infoPhone").textContent = phone;
+      document.getElementById("infoRefCode").textContent = referralCode;
+      document.getElementById("infoTotalBalance").textContent = formatNaira(totalBalance);
+
+      // Stats
+      document.getElementById("miniTotalDeposit").textContent = formatNaira(totalDeposit);
+      document.getElementById("miniTotalInvested").textContent = formatNaira(totalInvested);
+      document.getElementById("miniTotalEarned").textContent = formatNaira(totalEarnings);
+      document.getElementById("miniActivePlans").textContent = activePlansCount;
+
+      // Wallets
+      document.getElementById("wDeposit").textContent = formatNaira(depositWallet);
+      document.getElementById("wWithdraw").textContent = formatNaira(withdrawalWallet);
+      document.getElementById("wReferral").textContent = formatNaira(referralEarnings);
+
+    } catch (err) {
+      console.error("Profile load error:", err);
+      flashToast("Failed to load profile.", "error");
+    }
+  }
+
+  // ── Auth & Init ───────────────────────────────────
+  onAuthStateChanged(auth, async user => {
+    if (!user) {
+      window.location.href = "login.html";
+      return;
+    }
+    await loadProfile(user.uid);
+  });
+
+  // ── Logout Modal ──────────────────────────────────
+  const logoutModal = document.getElementById("logoutModal");
+
+  document.getElementById("logoutTrigger").addEventListener("click", () => {
+    logoutModal.classList.add("active");
+  });
+
+  document.getElementById("cancelLogout").addEventListener("click", () => {
+    logoutModal.classList.remove("active");
+  });
+
+  // Close modal on overlay click
+  logoutModal.addEventListener("click", (e) => {
+    if (e.target === logoutModal) {
+      logoutModal.classList.remove("active");
+    }
+  });
+
+  // ── Confirm Logout ────────────────────────────────
+  document.getElementById("confirmLogout").addEventListener("click", async () => {
+    const btn = document.getElementById("confirmLogout");
+    btn.disabled = true;
+    btn.classList.add("loading");
+
+    try {
+      await signOut(auth);
+      sessionStorage.removeItem("covix_user_cache");
+      sessionStorage.clear();
+      window.location.href = "login.html";
+    } catch (err) {
+      console.error("Logout error:", err);
+      flashToast("Logout failed. Please try again.", "error");
+      btn.disabled = false;
+      btn.classList.remove("loading");
+      logoutModal.classList.remove("active");
+    }
+  });
+
+  // ── Menu Actions ──────────────────────────────────
+  document.getElementById("securityMenu")?.addEventListener("click", () => {
+    flashToast("Security settings coming soon.", "info");
+  });
+
+  document.getElementById("aboutMenu")?.addEventListener("click", () => {
+    flashToast("Covix v1.0 — Terms & Policies coming soon.", "info");
+  });
+
+  console.log("⚡ Covix Profile — Ready");
+</script>
+</body>
+</html>

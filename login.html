@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>COVIX — Sign In</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #030712;
+    --surface: #0a0f1a;
+    --surface-2: #111827;
+    --surface-3: #1a2332;
+    --primary: #7c3aed;
+    --primary-light: #a78bfa;
+    --primary-dark: #5b21b6;
+    --primary-glow: rgba(124, 58, 237, 0.35);
+    --accent: #06b6d4;
+    --accent-glow: rgba(6, 182, 212, 0.3);
+    --text: #e2e8f0;
+    --text-bright: #ffffff;
+    --muted: #6b7280;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --error: #ef4444;
+    --border: rgba(255, 255, 255, 0.06);
+    --shadow-card: 0 4px 32px rgba(0, 0, 0, 0.5);
+    --radius-pill: 50px;
+    --radius-lg: 28px;
+    --radius-md: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .bg-geo {
+    position: fixed; pointer-events: none; z-index: 0;
+  }
+  .geo-1 {
+    width: 500px; height: 500px;
+    border: 1px solid rgba(124, 58, 237, 0.06);
+    border-radius: 60px;
+    top: -150px; right: -200px;
+    transform: rotate(25deg);
+    animation: geoRotate 30s linear infinite;
+  }
+  .geo-2 {
+    width: 350px; height: 350px;
+    border: 1px solid rgba(6, 182, 212, 0.05);
+    border-radius: 40px;
+    bottom: -100px; left: -120px;
+    transform: rotate(-15deg);
+    animation: geoRotate 25s linear infinite reverse;
+  }
+  .geo-3 {
+    width: 200px; height: 200px;
+    background: rgba(124, 58, 237, 0.04);
+    border-radius: 50%;
+    top: 30%; left: 10%;
+    filter: blur(60px);
+  }
+  .geo-4 {
+    width: 180px; height: 180px;
+    background: rgba(6, 182, 212, 0.03);
+    border-radius: 50%;
+    bottom: 20%; right: 8%;
+    filter: blur(60px);
+  }
+  @keyframes geoRotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .page-wrapper {
+    position: relative; z-index: 1;
+    width: 100%; max-width: 460px;
+    padding: 20px;
+  }
+
+  /* Logo */
+  .logo-area {
+    text-align: center; margin-bottom: 28px;
+  }
+  .logo-mark {
+    display: inline-flex; align-items: center; gap: 8px; margin-bottom: 12px;
+  }
+  .logo-hex {
+    width: 44px; height: 44px;
+    background: var(--primary);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 25px var(--primary-glow);
+  }
+  .logo-hex svg { width: 20px; height: 20px; color: #fff; }
+  .logo-text {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 24px; font-weight: 700;
+    color: var(--text-bright); letter-spacing: -0.5px;
+  }
+  .logo-area .tagline {
+    font-size: 12.5px; color: var(--muted); letter-spacing: 0.3px;
+  }
+
+  /* Login Card */
+  .login-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 32px 24px 24px;
+    box-shadow: var(--shadow-card);
+  }
+  .login-card h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px; font-weight: 700;
+    color: var(--text-bright);
+    margin-bottom: 4px; text-align: center;
+  }
+  .login-card .subhead {
+    text-align: center; font-size: 13px;
+    color: var(--muted); margin-bottom: 24px;
+  }
+
+  form { display: flex; flex-direction: column; gap: 16px; }
+
+  /* Pill Input */
+  .pill-group {
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .pill-group label {
+    font-size: 10px; font-weight: 700;
+    color: var(--muted);
+    letter-spacing: 0.7px; text-transform: uppercase;
+    margin-left: 14px;
+    font-family: 'Space Grotesk', sans-serif;
+  }
+  .pill-input-wrap { position: relative; }
+  .pill-input-wrap input {
+    width: 100%;
+    background: var(--surface-2);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-pill);
+    padding: 14px 20px;
+    color: var(--text-bright);
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    transition: all 0.25s ease;
+  }
+  .pill-input-wrap input::placeholder { color: #4b5563; font-size: 13px; }
+  .pill-input-wrap input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.12);
+  }
+  .pill-input-wrap input.input-error {
+    border-color: var(--error);
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.08);
+  }
+
+  .pill-input-wrap .eye-btn {
+    position: absolute; right: 12px; top: 50%;
+    transform: translateY(-50%);
+    background: none; border: none; cursor: pointer;
+    padding: 8px; color: var(--muted);
+    border-radius: 50%; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 2;
+  }
+  .pill-input-wrap .eye-btn:hover { color: #fff; background: var(--surface-3); }
+
+  .pill-hint {
+    font-size: 10.5px; min-height: 14px;
+    margin-left: 14px; font-weight: 500;
+  }
+  .pill-hint.invalid { color: var(--error); }
+
+  /* Forgot Link */
+  .forgot-row {
+    display: flex; justify-content: flex-end;
+    margin-top: -6px;
+  }
+  .forgot-link {
+    font-size: 12px; color: var(--primary-light);
+    text-decoration: none; font-weight: 600;
+    transition: color 0.2s;
+  }
+  .forgot-link:hover { color: var(--accent); text-decoration: underline; }
+
+  /* Submit Pill Button */
+  .submit-pill {
+    width: 100%; padding: 15px;
+    border: none; border-radius: var(--radius-pill);
+    background: var(--primary);
+    color: #fff;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px; font-weight: 700;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 28px var(--primary-glow);
+    letter-spacing: 0.3px;
+    margin-top: 4px;
+  }
+  .submit-pill:hover:not(:disabled) {
+    background: var(--primary-dark);
+    box-shadow: 0 12px 36px var(--primary-glow);
+    transform: translateY(-1px);
+  }
+  .submit-pill:active:not(:disabled) { transform: scale(0.98); }
+  .submit-pill:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .spinner-mini {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 2.5px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+  .submit-pill.loading .spinner-mini { display: inline-block; }
+  .submit-pill.loading .btn-label { display: none; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .signup-redirect {
+    text-align: center; margin-top: 20px;
+    font-size: 13px; color: var(--muted);
+  }
+  .signup-redirect a {
+    color: var(--primary-light); text-decoration: none; font-weight: 700;
+  }
+  .signup-redirect a:hover { text-decoration: underline; }
+
+  /* Toast */
+  .toast-zone {
+    position: fixed; top: 16px; right: 16px; z-index: 200;
+    display: flex; flex-direction: column; gap: 8px;
+    width: calc(100% - 32px); max-width: 380px;
+  }
+  .toast-item {
+    background: var(--surface-3); border: 1px solid var(--border);
+    padding: 13px 15px; border-radius: var(--radius-md);
+    font-size: 12.5px; box-shadow: var(--shadow-card);
+    animation: toastSlide 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    display: flex; align-items: center; gap: 8px; font-weight: 500;
+  }
+  .toast-item.error { border-left: 4px solid var(--error); }
+  .toast-item.success { border-left: 4px solid var(--success); }
+  .toast-emoji { font-size: 16px; flex: none; }
+
+  @keyframes toastSlide {
+    from { opacity: 0; transform: translateX(80px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  @media (max-width: 420px) {
+    .page-wrapper { padding: 12px; }
+    .login-card { padding: 24px 16px 20px; }
+    .logo-text { font-size: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-geo geo-1"></div>
+<div class="bg-geo geo-2"></div>
+<div class="bg-geo geo-3"></div>
+<div class="bg-geo geo-4"></div>
+<div class="toast-zone" id="toastZone"></div>
+
+<div class="page-wrapper">
+  <!-- Logo -->
+  <div class="logo-area">
+    <div class="logo-mark">
+      <div class="logo-hex">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+        </svg>
+      </div>
+      <span class="logo-text">COVIX</span>
+    </div>
+    <p class="tagline">Invest Smart • Earn Daily</p>
+  </div>
+
+  <!-- Login Card -->
+  <div class="login-card">
+    <h2>Welcome Back</h2>
+    <p class="subhead">Sign in to continue your journey</p>
+
+    <form id="loginForm" novalidate>
+      <!-- Email -->
+      <div class="pill-group">
+        <label for="email">Email Address</label>
+        <div class="pill-input-wrap">
+          <input type="email" id="email" placeholder="your@email.com" autocomplete="email" required>
+        </div>
+        <div class="pill-hint" id="emailHint"></div>
+      </div>
+
+      <!-- Password -->
+      <div class="pill-group">
+        <label for="password">Password</label>
+        <div class="pill-input-wrap">
+          <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password" required>
+          <button type="button" class="eye-btn" data-target="password" aria-label="Toggle password visibility">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div class="pill-hint" id="passwordHint"></div>
+      </div>
+
+      <!-- Forgot Password -->
+      <div class="forgot-row">
+        <a href="#" class="forgot-link" id="forgotLink">Forgot password?</a>
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" class="submit-pill" id="submitBtn">
+        <span class="btn-label">Sign In</span>
+        <span class="spinner-mini"></span>
+      </button>
+    </form>
+  </div>
+
+  <p class="signup-redirect">Don't have an account? <a href="index.html">Create one</a></p>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBjANH3YIecQIuVh4KOrHSA2JSVE0MVFdw",
+    authDomain: "covix-1f7d2.firebaseapp.com",
+    projectId: "covix-1f7d2",
+    storageBucket: "covix-1f7d2.firebasestorage.app",
+    messagingSenderId: "550748233984",
+    appId: "1:550748233984:web:ff2a36a3f601731a4ad3e5"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  function flashToast(msg, type = "info", dur = 4000) {
+    const zone = document.getElementById("toastZone");
+    const item = document.createElement("div");
+    item.className = `toast-item ${type}`;
+    const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+    item.innerHTML = `<span class="toast-emoji">${icons[type] || icons.info}</span>${msg}`;
+    if (zone.children.length >= 3) zone.removeChild(zone.firstChild);
+    zone.appendChild(item);
+    setTimeout(() => {
+      item.style.opacity = "0"; item.style.transform = "translateX(80px)";
+      item.style.transition = "all 0.3s";
+      setTimeout(() => { if (item.parentNode) item.remove(); }, 300);
+    }, dur);
+  }
+
+  // ── Password Toggle (Fixed) ───────────────────────
+  document.querySelectorAll(".eye-btn[data-target]").forEach(btn => {
+    btn.addEventListener("click", function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const input = document.getElementById(this.dataset.target);
+      if (!input) return;
+      const isHidden = input.type === "password";
+      input.type = isHidden ? "text" : "password";
+      this.innerHTML = isHidden
+        ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`
+        : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+    });
+  });
+
+  const els = {
+    email: document.getElementById("email"),
+    password: document.getElementById("password"),
+    submitBtn: document.getElementById("submitBtn"),
+    form: document.getElementById("loginForm")
+  };
+
+  function setHint(id, msg, state) {
+    const el = document.getElementById(id);
+    if (el) { el.textContent = msg; el.className = "pill-hint" + (state ? " " + state : ""); }
+  }
+  function markInput(el, state) {
+    if (el) { el.classList.remove("input-error"); if (state) el.classList.add(state); }
+  }
+
+  function validateEmail() {
+    const v = els.email.value.trim();
+    const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+    setHint("emailHint", ok ? "" : "Enter a valid email", ok ? "" : "invalid");
+    markInput(els.email, ok ? "" : "input-error");
+    return ok;
+  }
+  function validatePassword() {
+    setHint("passwordHint", "");
+    markInput(els.password, "");
+    return els.password.value.length > 0;
+  }
+
+  els.email.addEventListener("blur", validateEmail);
+  els.password.addEventListener("input", validatePassword);
+
+  // ── Form Submit ───────────────────────────────────
+  els.form.addEventListener("submit", async e => {
+    e.preventDefault();
+
+    if (!validateEmail()) {
+      flashToast("Enter a valid email address", "error");
+      return;
+    }
+    if (!validatePassword()) {
+      flashToast("Enter your password", "error");
+      return;
+    }
+
+    els.submitBtn.disabled = true;
+    els.submitBtn.classList.add("loading");
+    setHint("emailHint", "");
+    setHint("passwordHint", "");
+
+    try {
+      const cred = await signInWithEmailAndPassword(auth, els.email.value.trim(), els.password.value);
+      const uid = cred.user.uid;
+
+      const userSnap = await getDoc(doc(db, "users", uid));
+      if (!userSnap.exists()) {
+        flashToast("Account data not found. Contact support.", "error");
+        await auth.signOut();
+        els.submitBtn.disabled = false;
+        els.submitBtn.classList.remove("loading");
+        return;
+      }
+
+      const userData = userSnap.data();
+      sessionStorage.setItem("covix_user_cache", JSON.stringify({
+        uid,
+        name: userData.name,
+        username: userData.username,
+        referralCode: userData.referralCode
+      }));
+
+      flashToast("Login successful! Redirecting...", "success", 2000);
+      setTimeout(() => {
+        window.location.href = "dashboard.html";
+      }, 1200);
+    } catch (err) {
+      console.error("Login error:", err);
+      let msg = "Login failed. Try again.";
+      if (err.code === "auth/user-not-found" || err.code === "auth/invalid-credential") {
+        msg = "Invalid email or password.";
+      } else if (err.code === "auth/wrong-password") {
+        msg = "Incorrect password.";
+        markInput(els.password, "input-error");
+      } else if (err.code === "auth/too-many-requests") {
+        msg = "Too many attempts. Try again later.";
+      } else if (err.code === "auth/invalid-email") {
+        msg = "Invalid email address.";
+        markInput(els.email, "input-error");
+      }
+      flashToast(msg, "error");
+      els.submitBtn.disabled = false;
+      els.submitBtn.classList.remove("loading");
+    }
+  });
+
+  // ── Forgot Password ───────────────────────────────
+  document.getElementById("forgotLink")?.addEventListener("click", e => {
+    e.preventDefault();
+    flashToast("Password reset page coming soon.", "info");
+  });
+
+  console.log("⚡ Covix Login — Ready");
+</script>
+</body>
+</html>

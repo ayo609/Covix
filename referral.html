@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>COVIX — Referrals</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #030712;
+    --surface: #0a0f1a;
+    --surface-2: #111827;
+    --surface-3: #1a2332;
+    --primary: #7c3aed;
+    --primary-light: #a78bfa;
+    --primary-dark: #5b21b6;
+    --primary-glow: rgba(124, 58, 237, 0.35);
+    --accent: #06b6d4;
+    --accent-glow: rgba(6, 182, 212, 0.3);
+    --text: #e2e8f0;
+    --text-bright: #ffffff;
+    --muted: #6b7280;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --error: #ef4444;
+    --gold: #f59e0b;
+    --border: rgba(255, 255, 255, 0.06);
+    --shadow-card: 0 4px 32px rgba(0, 0, 0, 0.5);
+    --radius-lg: 28px;
+    --radius-md: 16px;
+    --radius-pill: 50px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  .bg-geo {
+    position: fixed; pointer-events: none; z-index: 0;
+  }
+  .geo-1 {
+    width: 400px; height: 400px;
+    border: 1px solid rgba(124, 58, 237, 0.06);
+    border-radius: 50px;
+    top: -100px; right: -150px;
+    transform: rotate(20deg);
+    animation: geoSpin 35s linear infinite;
+  }
+  .geo-2 {
+    width: 300px; height: 300px;
+    background: rgba(6, 182, 212, 0.03);
+    border-radius: 50%;
+    bottom: -80px; left: -100px;
+    filter: blur(50px);
+  }
+  @keyframes geoSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .page-container {
+    position: relative; z-index: 1;
+    max-width: 900px; margin: 0 auto;
+    padding: 24px 16px 100px;
+    animation: fadeIn 0.5s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  /* Top Bar */
+  .top-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px; gap: 12px;
+  }
+  .back-btn {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: var(--radius-pill); padding: 10px 18px;
+    color: var(--muted); font-size: 13px; cursor: pointer;
+    text-decoration: none; transition: all 0.25s;
+  }
+  .back-btn:hover { border-color: var(--primary); color: #fff; }
+  .page-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px; font-weight: 700; color: var(--text-bright);
+  }
+
+  /* Referral Stats Cards */
+  .ref-stats {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 12px; margin-bottom: 20px;
+  }
+  .ref-stat-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 18px 16px;
+    text-align: center;
+  }
+  .ref-stat-card .stat-icon {
+    width: 40px; height: 40px; border-radius: 50%;
+    margin: 0 auto 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .ref-stat-card .stat-icon.people { background: rgba(124, 58, 237, 0.15); }
+  .ref-stat-card .stat-icon.earn { background: rgba(16, 185, 129, 0.15); }
+  .ref-stat-card .stat-icon.bonus { background: rgba(245, 158, 11, 0.15); }
+  .ref-stat-value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 24px; font-weight: 700; color: var(--text-bright);
+  }
+  .ref-stat-label {
+    font-size: 10.5px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;
+  }
+
+  /* Referral Link Section */
+  .ref-link-card {
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(6, 182, 212, 0.08));
+    border: 1px solid rgba(124, 58, 237, 0.25);
+    border-radius: var(--radius-lg); padding: 24px;
+    margin-bottom: 20px; text-align: center;
+  }
+  .ref-link-card h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 6px;
+  }
+  .ref-link-card p {
+    font-size: 12.5px; color: var(--muted); margin-bottom: 16px;
+  }
+  .ref-link-row {
+    display: flex; gap: 8px; max-width: 500px; margin: 0 auto;
+  }
+  .ref-link-input {
+    flex: 1; background: var(--surface-2);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-pill);
+    padding: 12px 18px; color: var(--text-bright);
+    font-size: 12.5px; font-family: 'DM Sans', sans-serif;
+    outline: none; text-align: center;
+  }
+  .ref-link-input:focus { border-color: var(--primary); }
+  .copy-btn {
+    padding: 12px 20px;
+    background: var(--primary); border: none;
+    border-radius: var(--radius-pill);
+    color: #fff; font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px; font-weight: 700; cursor: pointer;
+    transition: all 0.25s; white-space: nowrap;
+    box-shadow: 0 6px 20px var(--primary-glow);
+  }
+  .copy-btn:hover { background: var(--primary-dark); }
+  .copy-btn.copied { background: var(--success); }
+
+  /* Referral Code Card */
+  .ref-code-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 18px 20px;
+    margin-bottom: 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px;
+  }
+  .ref-code-info h4 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px;
+  }
+  .ref-code-info .code-display {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px; font-weight: 700; color: var(--primary-light);
+    letter-spacing: 1px;
+  }
+  .share-btn {
+    padding: 10px 18px;
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: var(--radius-pill); color: var(--text);
+    font-family: 'DM Sans', sans-serif; font-size: 13px;
+    cursor: pointer; transition: all 0.25s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .share-btn:hover { border-color: var(--primary); color: var(--primary-light); }
+
+  /* Bonus Tiers */
+  .bonus-tiers {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 10px; margin-bottom: 24px;
+  }
+  .tier-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 16px; text-align: center;
+  }
+  .tier-card .tier-level {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px;
+  }
+  .tier-card .tier-percent {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 32px; font-weight: 700;
+    background: linear-gradient(135deg, var(--primary-light), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .tier-card .tier-desc {
+    font-size: 11px; color: var(--muted); margin-top: 2px;
+  }
+
+  /* Section Header */
+  .section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .section-header h4 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px; font-weight: 700; color: var(--text-bright);
+  }
+  .section-header .count-badge {
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: var(--radius-pill); padding: 4px 12px;
+    font-size: 11px; color: var(--muted); font-weight: 600;
+  }
+
+  /* Downline List */
+  .downline-list {
+    display: flex; flex-direction: column; gap: 8px;
+    margin-bottom: 20px;
+  }
+  .downline-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 16px;
+    transition: all 0.25s;
+  }
+  .downline-card:hover { border-color: var(--primary); }
+  .downline-top {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .downline-user {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .downline-avatar {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px; font-weight: 700; color: #fff; flex: none;
+  }
+  .downline-name {
+    font-size: 14px; font-weight: 600; color: var(--text-bright);
+  }
+  .downline-username {
+    font-size: 11.5px; color: var(--muted);
+  }
+  .downline-level {
+    background: rgba(124, 58, 237, 0.15);
+    border: 1px solid rgba(124, 58, 237, 0.3);
+    border-radius: var(--radius-pill);
+    padding: 4px 12px;
+    font-size: 10px; font-weight: 700; color: var(--primary-light);
+    text-transform: uppercase;
+  }
+  .downline-details {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+  .detail-item {
+    text-align: center;
+    padding: 8px;
+    background: var(--surface-2);
+    border-radius: 10px;
+  }
+  .detail-value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px; font-weight: 700; color: var(--text-bright);
+    margin-bottom: 2px;
+  }
+  .detail-label {
+    font-size: 9.5px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.3px; font-weight: 600;
+  }
+  .detail-value.invested { color: var(--accent); }
+  .detail-value.deposited { color: var(--success); }
+  .detail-value.bonus { color: var(--gold); }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center; padding: 40px 20px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+  }
+  .empty-state svg { width: 48px; height: 48px; color: var(--muted); margin-bottom: 12px; }
+  .empty-state p { color: var(--muted); font-size: 13px; margin-bottom: 4px; }
+  .empty-state .empty-action {
+    color: var(--primary-light); font-size: 12px; font-weight: 600; text-decoration: none;
+  }
+
+  /* Toast */
+  .toast-zone {
+    position: fixed; top: 16px; right: 16px; z-index: 200;
+    display: flex; flex-direction: column; gap: 8px;
+    width: calc(100% - 32px); max-width: 380px;
+  }
+  .toast-item {
+    background: var(--surface-3); border: 1px solid var(--border);
+    padding: 14px 16px; border-radius: var(--radius-md);
+    font-size: 13px; box-shadow: var(--shadow-card);
+    animation: toastSlide 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    display: flex; align-items: center; gap: 10px; font-weight: 500;
+  }
+  .toast-item.error { border-left: 4px solid var(--error); }
+  .toast-item.success { border-left: 4px solid var(--success); }
+  .toast-emoji { font-size: 18px; flex: none; }
+
+  @keyframes toastSlide {
+    from { opacity: 0; transform: translateX(80px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  /* Bottom Nav */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--surface); border-top: 1px solid var(--border);
+    display: flex; justify-content: space-around;
+    padding: 10px 0 env(safe-area-inset-bottom, 10px);
+    z-index: 100; box-shadow: 0 -5px 25px rgba(0,0,0,0.4);
+  }
+  .nav-item {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    color: var(--muted); text-decoration: none; font-size: 10px; font-weight: 600;
+    padding: 6px 16px; border-radius: 50px; transition: all 0.25s;
+  }
+  .nav-item.active { color: var(--primary-light); }
+  .nav-item svg { width: 20px; height: 20px; }
+
+  @media (max-width: 600px) {
+    .ref-stats { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .ref-stat-value { font-size: 18px; }
+    .bonus-tiers { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+    .tier-card .tier-percent { font-size: 24px; }
+    .downline-details { grid-template-columns: repeat(2, 1fr); }
+    .ref-link-row { flex-direction: column; }
+    .ref-code-card { flex-direction: column; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-geo geo-1"></div>
+<div class="bg-geo geo-2"></div>
+<div class="toast-zone" id="toastZone"></div>
+
+<div class="page-container">
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <a href="dashboard.html" class="back-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>
+      Back
+    </a>
+    <span class="page-title">Referrals</span>
+    <div style="width:60px;"></div>
+  </div>
+
+  <!-- Stats -->
+  <div class="ref-stats">
+    <div class="ref-stat-card">
+      <div class="stat-icon people">👥</div>
+      <div class="ref-stat-value" id="totalDownlines">0</div>
+      <div class="ref-stat-label">Total Downlines</div>
+    </div>
+    <div class="ref-stat-card">
+      <div class="stat-icon earn">💰</div>
+      <div class="ref-stat-value" id="totalRefEarnings">₦0</div>
+      <div class="ref-stat-label">Referral Earnings</div>
+    </div>
+    <div class="ref-stat-card">
+      <div class="stat-icon bonus">🎯</div>
+      <div class="ref-stat-value" id="totalRefBonus">₦0</div>
+      <div class="ref-stat-label">Total Bonus Paid</div>
+    </div>
+  </div>
+
+  <!-- Bonus Tiers -->
+  <div class="bonus-tiers">
+    <div class="tier-card">
+      <div class="tier-level">Level 1 — Direct</div>
+      <div class="tier-percent">22%</div>
+      <div class="tier-desc">On each plan purchase</div>
+    </div>
+    <div class="tier-card">
+      <div class="tier-level">Level 2 — Indirect</div>
+      <div class="tier-percent">2%</div>
+      <div class="tier-desc">On each plan purchase</div>
+    </div>
+    <div class="tier-card">
+      <div class="tier-level">Level 3 — Indirect</div>
+      <div class="tier-percent">1%</div>
+      <div class="tier-desc">On each plan purchase</div>
+    </div>
+  </div>
+
+  <!-- Referral Link -->
+  <div class="ref-link-card">
+    <h3>Your Referral Link</h3>
+    <p>Share this link to invite friends and earn bonuses</p>
+    <div class="ref-link-row">
+      <input type="text" class="ref-link-input" id="refLinkInput" readonly>
+      <button class="copy-btn" id="copyLinkBtn">📋 Copy</button>
+    </div>
+  </div>
+
+  <!-- Referral Code -->
+  <div class="ref-code-card">
+    <div class="ref-code-info">
+      <h4>Your Referral Code</h4>
+      <div class="code-display" id="refCodeDisplay">CVX-XXXXXX</div>
+    </div>
+    <button class="share-btn" id="shareCodeBtn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      Share Code
+    </button>
+  </div>
+
+  <!-- Downlines -->
+  <div class="section-header">
+    <h4>Your Downlines</h4>
+    <span class="count-badge" id="downlineCount">0 members</span>
+  </div>
+  <div class="downline-list" id="downlineList">
+    <div class="empty-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17,11 19,13 23,9"/></svg>
+      <p>No downlines yet</p>
+      <a href="dashboard.html" class="empty-action">Share your link to start earning →</a>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Navigation -->
+<nav class="bottom-nav">
+  <a href="dashboard.html" class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+    Home
+  </a>
+  <a href="invest.html" class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>
+    Invest
+  </a>
+  <a href="referral.html" class="nav-item active">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17,11 19,13 23,9"/></svg>
+    Referral
+  </a>
+  <a href="profile.html" class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Profile
+  </a>
+</nav>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBjANH3YIecQIuVh4KOrHSA2JSVE0MVFdw",
+    authDomain: "covix-1f7d2.firebaseapp.com",
+    projectId: "covix-1f7d2",
+    storageBucket: "covix-1f7d2.firebasestorage.app",
+    messagingSenderId: "550748233984",
+    appId: "1:550748233984:web:ff2a36a3f601731a4ad3e5"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  let currentUser = null;
+
+  function flashToast(msg, type = "info", dur = 4000) {
+    const zone = document.getElementById("toastZone");
+    const item = document.createElement("div");
+    item.className = `toast-item ${type}`;
+    const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+    item.innerHTML = `<span class="toast-emoji">${icons[type] || icons.info}</span>${msg}`;
+    if (zone.children.length >= 3) zone.removeChild(zone.firstChild);
+    zone.appendChild(item);
+    setTimeout(() => {
+      item.style.opacity = "0"; item.style.transform = "translateX(80px)";
+      item.style.transition = "all 0.3s";
+      setTimeout(() => { if (item.parentNode) item.remove(); }, 300);
+    }, dur);
+  }
+
+  function formatNaira(amount) {
+    return "₦" + Number(amount || 0).toLocaleString("en-NG");
+  }
+
+  function formatDate(timestamp) {
+    if (!timestamp) return "Unknown";
+    const date = new Date(timestamp.seconds * 1000);
+    return date.toLocaleDateString("en-NG", { day: "numeric", month: "short", year: "numeric" });
+  }
+
+  // ── Load Referral Data ────────────────────────────
+  async function loadReferralData(uid) {
+    try {
+      // Get user data
+      const userSnap = await getDoc(doc(db, "users", uid));
+      if (!userSnap.exists()) {
+        flashToast("Account not found.", "error");
+        return;
+      }
+
+      const userData = userSnap.data();
+      const referralCode = userData.referralCode || "CVX-XXXXXX";
+      const referralEarnings = userData.referralEarnings || 0;
+
+      // Update referral code display
+      document.getElementById("refCodeDisplay").textContent = referralCode;
+      document.getElementById("totalRefEarnings").textContent = formatNaira(referralEarnings);
+
+      // Set referral link
+      const refLink = window.location.origin + "/register.html?ref=" + referralCode;
+      document.getElementById("refLinkInput").value = refLink;
+
+      // Get downlines list
+      const downlinesSnap = await getDoc(doc(db, "users", uid, "referrals", "downlines"));
+      let downlineIds = [];
+      if (downlinesSnap.exists()) {
+        downlineIds = downlinesSnap.data().ids || [];
+      }
+
+      document.getElementById("totalDownlines").textContent = downlineIds.length;
+      document.getElementById("downlineCount").textContent = downlineIds.length + " member" + (downlineIds.length !== 1 ? "s" : "");
+
+      if (downlineIds.length === 0) {
+        document.getElementById("downlineList").innerHTML = `
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17,11 19,13 23,9"/></svg>
+            <p>No downlines yet</p>
+            <a href="dashboard.html" class="empty-action">Share your link to start earning →</a>
+          </div>`;
+        document.getElementById("totalRefBonus").textContent = formatNaira(referralEarnings);
+        return;
+      }
+
+      // Fetch each downline's details
+      let totalBonusPaid = 0;
+      const downlineCards = [];
+
+      for (const dlId of downlineIds) {
+        try {
+          const dlSnap = await getDoc(doc(db, "users", dlId));
+          if (!dlSnap.exists()) continue;
+
+          const dl = dlSnap.data();
+          const dlName = dl.name || "Unknown";
+          const dlUsername = dl.username || "unknown";
+          const dlCreatedAt = dl.createdAt || null;
+          const dlDepositWallet = dl.depositWallet || 0;
+          const dlTotalDeposit = dl.totalDeposit || 0;
+          const dlTotalInvested = dl.totalInvested || 0;
+          const dlActivePlans = dl.activePlansCount || 0;
+
+          // Calculate bonus paid to THIS user from this downline
+          let bonusFromThisDownline = 0;
+          const bonusSnap = await getDoc(doc(db, "users", uid, "referrals", "bonuses", dlId));
+          if (bonusSnap.exists()) {
+            bonusFromThisDownline = bonusSnap.data().totalBonus || 0;
+          }
+          totalBonusPaid += bonusFromThisDownline;
+
+          // Determine level
+          let level = "Level 1";
+          if (dl.referredBy) {
+            const parentSnap = await getDoc(doc(db, "users", dl.referredBy));
+            if (parentSnap.exists() && parentSnap.data().referredBy === uid) {
+              level = "Level 2";
+              const grandparentSnap = await getDoc(doc(db, "users", parentSnap.data().referredBy));
+              if (grandparentSnap.exists() && grandparentSnap.data().referredBy === uid) {
+                level = "Level 3";
+              }
+            }
+          }
+
+          downlineCards.push({
+            id: dlId,
+            name: dlName,
+            username: dlUsername,
+            createdAt: dlCreatedAt,
+            totalDeposit: dlTotalDeposit,
+            totalInvested: dlTotalInvested,
+            activePlans: dlActivePlans,
+            bonusEarned: bonusFromThisDownline,
+            level: level
+          });
+        } catch (err) {
+          console.error("Error loading downline:", dlId, err);
+        }
+      }
+
+      document.getElementById("totalRefBonus").textContent = formatNaira(totalBonusPaid);
+
+      // Render downline cards
+      if (downlineCards.length === 0) {
+        document.getElementById("downlineList").innerHTML = `
+          <div class="empty-state">
+            <p>Unable to load downline details</p>
+          </div>`;
+        return;
+      }
+
+      document.getElementById("downlineList").innerHTML = downlineCards.map(dl => `
+        <div class="downline-card">
+          <div class="downline-top">
+            <div class="downline-user">
+              <div class="downline-avatar">${dl.name.charAt(0).toUpperCase()}</div>
+              <div>
+                <div class="downline-name">${dl.name}</div>
+                <div class="downline-username">@${dl.username}</div>
+              </div>
+            </div>
+            <span class="downline-level">${dl.level}</span>
+          </div>
+          <div class="downline-details">
+            <div class="detail-item">
+              <div class="detail-value">${formatDate(dl.createdAt)}</div>
+              <div class="detail-label">Registered</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-value deposited">${formatNaira(dl.totalDeposit)}</div>
+              <div class="detail-label">Total Deposits</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-value invested">${formatNaira(dl.totalInvested)} (${dl.activePlans} active)</div>
+              <div class="detail-label">Invested / Plans</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-value bonus">${formatNaira(dl.bonusEarned)}</div>
+              <div class="detail-label">Bonus from user</div>
+            </div>
+          </div>
+        </div>
+      `).join("");
+
+    } catch (err) {
+      console.error("Referral data error:", err);
+      flashToast("Failed to load referral data.", "error");
+    }
+  }
+
+  // ── Auth & Init ───────────────────────────────────
+  onAuthStateChanged(auth, async user => {
+    if (!user) {
+      window.location.href = "login.html";
+      return;
+    }
+    currentUser = user;
+    await loadReferralData(user.uid);
+  });
+
+  // ── Copy Link ─────────────────────────────────────
+  document.getElementById("copyLinkBtn").addEventListener("click", () => {
+    const input = document.getElementById("refLinkInput");
+    input.select();
+    input.setSelectionRange(0, 99999);
+    
+    try {
+      navigator.clipboard.writeText(input.value).then(() => {
+        const btn = document.getElementById("copyLinkBtn");
+        btn.textContent = "✓ Copied!";
+        btn.classList.add("copied");
+        flashToast("Referral link copied!", "success", 2000);
+        setTimeout(() => {
+          btn.textContent = "📋 Copy";
+          btn.classList.remove("copied");
+        }, 2000);
+      });
+    } catch (err) {
+      // Fallback
+      document.execCommand("copy");
+      flashToast("Link copied!", "success", 2000);
+    }
+  });
+
+  // ── Share Code ────────────────────────────────────
+  document.getElementById("shareCodeBtn").addEventListener("click", () => {
+    const code = document.getElementById("refCodeDisplay").textContent;
+    const link = document.getElementById("refLinkInput").value;
+    const shareText = `Join Covix and earn daily returns! Use my referral code: ${code}\n${link}`;
+
+    if (navigator.share) {
+      navigator.share({
+        title: "Join Covix",
+        text: shareText,
+        url: link
+      }).catch(() => {});
+    } else {
+      // Fallback — copy to clipboard
+      navigator.clipboard.writeText(shareText).then(() => {
+        flashToast("Referral info copied! Share it with friends.", "success");
+      }).catch(() => {
+        flashToast("Copy the link above to share.", "info");
+      });
+    }
+  });
+
+  console.log("⚡ Covix Referral Page — Ready");
+</script>
+</body>
+</html>

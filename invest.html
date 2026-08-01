@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>COVIX — Investment Plans</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #030712;
+    --surface: #0a0f1a;
+    --surface-2: #111827;
+    --surface-3: #1a2332;
+    --primary: #7c3aed;
+    --primary-light: #a78bfa;
+    --primary-dark: #5b21b6;
+    --primary-glow: rgba(124, 58, 237, 0.35);
+    --accent: #06b6d4;
+    --accent-glow: rgba(6, 182, 212, 0.3);
+    --text: #e2e8f0;
+    --text-bright: #ffffff;
+    --muted: #6b7280;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --error: #ef4444;
+    --gold: #f59e0b;
+    --border: rgba(255, 255, 255, 0.06);
+    --shadow-card: 0 4px 32px rgba(0, 0, 0, 0.5);
+    --shadow-glow: 0 0 60px rgba(124, 58, 237, 0.15);
+    --radius-lg: 28px;
+    --radius-md: 16px;
+    --radius-pill: 50px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  .bg-glow {
+    position: fixed; pointer-events: none; z-index: 0;
+    border-radius: 50%; filter: blur(80px); opacity: 0.2;
+  }
+  .glow-1 { width: 280px; height: 280px; background: rgba(124, 58, 237, 0.12); top: -80px; right: -60px; }
+  .glow-2 { width: 250px; height: 250px; background: rgba(6, 182, 212, 0.08); bottom: -80px; left: -70px; }
+
+  .page-container {
+    position: relative; z-index: 1;
+    max-width: 1000px; margin: 0 auto;
+    padding: 24px 16px 100px;
+    animation: fadeIn 0.5s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .top-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .back-btn {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: var(--radius-pill); padding: 10px 18px;
+    color: var(--muted); font-size: 13px; cursor: pointer;
+    text-decoration: none; transition: all 0.25s;
+  }
+  .back-btn:hover { border-color: var(--primary); color: #fff; }
+  .wallet-mini {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-pill); padding: 10px 18px;
+    font-size: 13px; font-weight: 600;
+  }
+  .wallet-mini span { color: var(--primary-light); }
+
+  .page-header {
+    text-align: center; margin-bottom: 28px;
+  }
+  .page-header h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 28px; font-weight: 700; color: var(--text-bright); margin-bottom: 4px;
+  }
+  .page-header h2 .highlight {
+    background: linear-gradient(135deg, var(--primary-light), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .page-header p { color: var(--muted); font-size: 13.5px; }
+
+  .plans-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+  }
+  .plan-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 24px 18px;
+    text-align: center; position: relative;
+    transition: all 0.3s ease; overflow: hidden;
+  }
+  .plan-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .plan-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-4px);
+    box-shadow: 0 15px 40px rgba(124, 58, 237, 0.2);
+  }
+  .plan-card:hover::before { opacity: 1; }
+  .plan-card.featured { border-color: var(--primary); box-shadow: 0 8px 30px rgba(124, 58, 237, 0.2); }
+  .plan-card.featured::before { opacity: 1; }
+  .featured-badge {
+    position: absolute; top: 12px; right: 12px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: #fff; font-size: 9px; font-weight: 700;
+    padding: 4px 10px; border-radius: var(--radius-pill);
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .plan-tier {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px; font-weight: 700; color: var(--primary-light);
+    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;
+  }
+  .plan-price {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 30px; font-weight: 700; color: var(--text-bright); margin-bottom: 14px;
+  }
+  .plan-details {
+    display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px;
+  }
+  .plan-detail-row {
+    display: flex; justify-content: space-between;
+    font-size: 12.5px; padding: 6px 0; border-bottom: 1px solid var(--border);
+  }
+  .plan-detail-row:last-child { border-bottom: none; }
+  .plan-detail-label { color: var(--muted); }
+  .plan-detail-value { color: var(--text-bright); font-weight: 600; }
+  .plan-detail-value.highlight { color: var(--success); }
+  .invest-btn {
+    width: 100%; padding: 13px; border: none; border-radius: var(--radius-pill);
+    background: var(--primary); color: #fff;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px; font-weight: 700; cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 20px var(--primary-glow);
+  }
+  .invest-btn:hover:not(:disabled) { background: var(--primary-dark); transform: translateY(-2px); }
+  .invest-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  /* Modals */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(3, 7, 18, 0.9);
+    backdrop-filter: blur(8px);
+    display: none; align-items: center; justify-content: center;
+    z-index: 150; padding: 20px;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal-dialog {
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 30px 24px;
+    max-width: 440px; width: 100%; text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+    animation: popIn 0.45s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.85) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .modal-dialog .modal-icon {
+    width: 60px; height: 60px; border-radius: 50%;
+    margin: 0 auto 16px; display: flex; align-items: center; justify-content: center;
+  }
+  .modal-dialog .modal-icon.confirm { background: rgba(124, 58, 237, 0.15); }
+  .modal-dialog .modal-icon.confirm svg { color: var(--primary-light); width: 28px; height: 28px; }
+  .modal-dialog .modal-icon.success { background: rgba(16, 185, 129, 0.15); }
+  .modal-dialog .modal-icon.success svg { color: var(--success); width: 28px; height: 28px; }
+  .modal-dialog h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 20px; font-weight: 700; color: var(--text-bright); margin-bottom: 8px;
+  }
+  .modal-dialog p { color: var(--muted); font-size: 13.5px; line-height: 1.6; margin-bottom: 6px; }
+  .modal-plan-summary {
+    background: var(--surface-3); border-radius: var(--radius-md);
+    padding: 14px; margin: 16px 0; text-align: left;
+  }
+  .modal-plan-summary .summary-row {
+    display: flex; justify-content: space-between;
+    font-size: 13px; padding: 5px 0;
+  }
+  .summary-label { color: var(--muted); }
+  .summary-value { color: var(--text-bright); font-weight: 600; }
+  .modal-balance-warn { color: var(--error); font-size: 12px; margin-top: 8px; }
+  .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+  .modal-btn {
+    flex: 1; padding: 13px; border: none; border-radius: var(--radius-pill);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13.5px; font-weight: 700; cursor: pointer; transition: all 0.3s;
+  }
+  .modal-btn.cancel {
+    background: var(--surface-3); color: var(--muted); border: 1px solid var(--border);
+  }
+  .modal-btn.cancel:hover { border-color: var(--error); color: var(--error); }
+  .modal-btn.primary {
+    background: var(--primary); color: #fff;
+    box-shadow: 0 6px 20px var(--primary-glow);
+  }
+  .modal-btn.primary:hover { background: var(--primary-dark); }
+  .modal-btn.primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .referral-alert {
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    border-radius: var(--radius-md); padding: 16px;
+    margin: 14px 0; text-align: left;
+  }
+  .referral-alert .ref-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px; font-weight: 700; color: var(--gold);
+    margin-bottom: 6px; display: flex; align-items: center; gap: 6px;
+  }
+  .referral-alert .ref-detail { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+  .btn-loader {
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 2.5px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+  .modal-btn.primary.loading .btn-loader { display: inline-block; }
+  .modal-btn.primary.loading .btn-label { display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .toast-zone {
+    position: fixed; top: 16px; right: 16px; z-index: 200;
+    display: flex; flex-direction: column; gap: 8px;
+    width: calc(100% - 32px); max-width: 380px;
+  }
+  .toast-item {
+    background: var(--surface-3); border: 1px solid var(--border);
+    padding: 13px 15px; border-radius: var(--radius-md);
+    font-size: 12.5px; box-shadow: var(--shadow-card);
+    animation: toastSlide 0.4s ease;
+    display: flex; align-items: center; gap: 8px; font-weight: 500;
+  }
+  .toast-item.error { border-left: 4px solid var(--error); }
+  .toast-item.success { border-left: 4px solid var(--success); }
+  .toast-emoji { font-size: 16px; flex: none; }
+  @keyframes toastSlide {
+    from { opacity: 0; transform: translateX(80px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--surface); border-top: 1px solid var(--border);
+    display: flex; justify-content: space-around;
+    padding: 10px 0 env(safe-area-inset-bottom, 10px);
+    z-index: 100; box-shadow: 0 -5px 25px rgba(0,0,0,0.4);
+  }
+  .nav-item {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    color: var(--muted); text-decoration: none; font-size: 10px; font-weight: 600;
+    padding: 6px 16px; border-radius: 50px; transition: all 0.25s;
+  }
+  .nav-item.active { color: var(--primary-light); }
+  .nav-item svg { width: 20px; height: 20px; }
+
+  @media (max-width: 900px) {
+    .plans-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 550px) {
+    .plans-grid { grid-template-columns: 1fr; max-width: 380px; margin: 0 auto; }
+    .page-container { padding: 16px 10px 90px; }
+    .page-header h2 { font-size: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-glow glow-1"></div>
+<div class="bg-glow glow-2"></div>
+<div class="toast-zone" id="toastZone"></div>
+
+<div class="page-container">
+  <div class="top-bar">
+    <a href="dashboard.html" class="back-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>
+      Back
+    </a>
+    <div class="wallet-mini">Deposit Wallet: <span id="miniWallet">₦0</span></div>
+  </div>
+
+  <div class="page-header">
+    <h2>Choose Your <span class="highlight">Plan</span></h2>
+    <p>Invest and earn daily returns for 40 days</p>
+  </div>
+
+  <div class="plans-grid" id="plansGrid"></div>
+</div>
+
+<!-- Confirm Modal -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal-dialog">
+    <div class="modal-icon confirm">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+    </div>
+    <h3 id="confirmPlanName">Confirm Purchase</h3>
+    <div class="modal-plan-summary" id="confirmSummary"></div>
+    <p class="modal-balance-warn" id="balanceWarn" style="display:none;">⚠ Insufficient balance. Please deposit first.</p>
+    <div class="modal-actions">
+      <button class="modal-btn cancel" onclick="closeModal('confirmModal')">Cancel</button>
+      <button class="modal-btn primary" id="confirmInvestBtn">
+        <span class="btn-label">Confirm Purchase</span>
+        <span class="btn-loader"></span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal-overlay" id="successModal">
+  <div class="modal-dialog">
+    <div class="modal-icon success">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20,6 9,17 4,12"/></svg>
+    </div>
+    <h3>Investment Activated!</h3>
+    <p id="successMessage">Your plan has been purchased successfully.</p>
+    <div class="referral-alert" id="referralAlert" style="display:none;">
+      <div class="ref-title">🎉 Referral Bonus Sent!</div>
+      <div class="ref-detail" id="referralDetail"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn primary" onclick="closeModal('successModal'); window.location.href='dashboard.html';">Go to Dashboard</button>
+    </div>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <a href="dashboard.html" class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+    Home
+  </a>
+  <a href="invest.html" class="nav-item active">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>
+    Invest
+  </a>
+  <a href="referral.html" class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17,11 19,13 23,9"/></svg>
+    Referral
+  </a>
+  <a href="profile.html" class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Profile
+  </a>
+</nav>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBjANH3YIecQIuVh4KOrHSA2JSVE0MVFdw",
+    authDomain: "covix-1f7d2.firebaseapp.com",
+    projectId: "covix-1f7d2",
+    storageBucket: "covix-1f7d2.firebasestorage.app",
+    messagingSenderId: "550748233984",
+    appId: "1:550748233984:web:ff2a36a3f601731a4ad3e5"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const plans = [
+    { id: "starter", name: "Starter", price: 3000, daily: 950, total: 38000, duration: 40, tier: 1 },
+    { id: "bronze", name: "Bronze", price: 5000, daily: 1660, total: 66400, duration: 40, tier: 2 },
+    { id: "silver", name: "Silver", price: 10000, daily: 3320, total: 132800, duration: 40, tier: 3 },
+    { id: "gold", name: "Gold", price: 20000, daily: 6640, total: 265600, duration: 40, tier: 4 },
+    { id: "platinum", name: "Platinum", price: 30000, daily: 9960, total: 398400, duration: 40, tier: 5 },
+    { id: "diamond", name: "Diamond", price: 50000, daily: 16600, total: 664000, duration: 40, tier: 6 },
+    { id: "elite", name: "Elite", price: 100000, daily: 33200, total: 1328000, duration: 40, tier: 7 },
+    { id: "royal", name: "Royal", price: 200000, daily: 66400, total: 2656000, duration: 40, tier: 8 },
+    { id: "prestige", name: "Prestige", price: 400000, daily: 133800, total: 5312000, duration: 40, tier: 9 },
+    { id: "imperial", name: "Imperial", price: 600000, daily: 215000, total: 8600000, duration: 40, tier: 10 },
+    { id: "legend", name: "Legend", price: 1000000, daily: 400000, total: 16000000, duration: 40, tier: 11 }
+  ];
+
+  const REFERRAL_BONUS = { level1: 0.22, level2: 0.02, level3: 0.01 };
+
+  let currentUser = null;
+  let userData = null;
+  let selectedPlan = null;
+
+  function flashToast(msg, type = "info", dur = 4000) {
+    const zone = document.getElementById("toastZone");
+    const item = document.createElement("div");
+    item.className = `toast-item ${type}`;
+    const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+    item.innerHTML = `<span class="toast-emoji">${icons[type] || icons.info}</span>${msg}`;
+    if (zone.children.length >= 3) zone.removeChild(zone.firstChild);
+    zone.appendChild(item);
+    setTimeout(() => {
+      item.style.opacity = "0"; item.style.transform = "translateX(80px)";
+      item.style.transition = "all 0.3s";
+      setTimeout(() => { if (item.parentNode) item.remove(); }, 300);
+    }, dur);
+  }
+
+  function formatNaira(amount) {
+    return "₦" + Number(amount || 0).toLocaleString("en-NG");
+  }
+
+  window.closeModal = function(id) {
+    document.getElementById(id).classList.remove("active");
+  };
+
+  function renderPlans(depositWallet) {
+    const grid = document.getElementById("plansGrid");
+    grid.innerHTML = plans.map((plan, index) => {
+      const featured = index === 4;
+      const canAfford = depositWallet >= plan.price;
+      return `
+        <div class="plan-card ${featured ? 'featured' : ''}">
+          ${featured ? '<div class="featured-badge">Popular</div>' : ''}
+          <div class="plan-tier">${plan.name}</div>
+          <div class="plan-price">${formatNaira(plan.price)}</div>
+          <div class="plan-details">
+            <div class="plan-detail-row">
+              <span class="plan-detail-label">Daily Earning</span>
+              <span class="plan-detail-value highlight">${formatNaira(plan.daily)}</span>
+            </div>
+            <div class="plan-detail-row">
+              <span class="plan-detail-label">Total Income</span>
+              <span class="plan-detail-value">${formatNaira(plan.total)}</span>
+            </div>
+            <div class="plan-detail-row">
+              <span class="plan-detail-label">Duration</span>
+              <span class="plan-detail-value">${plan.duration} Days</span>
+            </div>
+          </div>
+          <button class="invest-btn" data-plan-index="${index}" ${!canAfford ? 'disabled' : ''}>
+            ${canAfford ? 'Invest Now' : 'Insufficient Balance'}
+          </button>
+        </div>`;
+    }).join("");
+
+    grid.querySelectorAll(".invest-btn:not([disabled])").forEach(btn => {
+      btn.addEventListener("click", () => openConfirmModal(plans[parseInt(btn.dataset.planIndex)]));
+    });
+    grid.querySelectorAll(".invest-btn[disabled]").forEach(btn => {
+      btn.addEventListener("click", () => flashToast("Insufficient balance. Deposit first.", "warning"));
+    });
+  }
+
+  function openConfirmModal(plan) {
+    selectedPlan = plan;
+    const depositWallet = userData.depositWallet || 0;
+    document.getElementById("confirmPlanName").textContent = "Purchase " + plan.name + " Plan";
+    document.getElementById("confirmSummary").innerHTML = `
+      <div class="summary-row"><span class="summary-label">Plan</span><span class="summary-value">${plan.name}</span></div>
+      <div class="summary-row"><span class="summary-label">Price</span><span class="summary-value">${formatNaira(plan.price)}</span></div>
+      <div class="summary-row"><span class="summary-label">Daily Earning</span><span class="summary-value" style="color:var(--success);">${formatNaira(plan.daily)}</span></div>
+      <div class="summary-row"><span class="summary-label">Total Income</span><span class="summary-value">${formatNaira(plan.total)}</span></div>
+      <div class="summary-row"><span class="summary-label">Duration</span><span class="summary-value">${plan.duration} Days</span></div>
+      <div class="summary-row" style="border-top:1px solid var(--border);margin-top:6px;padding-top:6px;">
+        <span class="summary-label">Your Balance</span>
+        <span class="summary-value" style="color:${depositWallet >= plan.price ? 'var(--success)' : 'var(--error)'};">${formatNaira(depositWallet)}</span>
+      </div>`;
+    const warn = document.getElementById("balanceWarn");
+    const btn = document.getElementById("confirmInvestBtn");
+    if (depositWallet < plan.price) { warn.style.display = "block"; btn.disabled = true; }
+    else { warn.style.display = "none"; btn.disabled = false; }
+    document.getElementById("confirmModal").classList.add("active");
+  }
+
+  async function processPurchase() {
+    if (!selectedPlan || !currentUser || !userData) return;
+    const plan = selectedPlan;
+    if ((userData.depositWallet || 0) < plan.price) { flashToast("Insufficient balance.", "error"); return; }
+
+    const confirmBtn = document.getElementById("confirmInvestBtn");
+    confirmBtn.disabled = true;
+    confirmBtn.classList.add("loading");
+
+    try {
+      const uid = currentUser.uid;
+      const newBalance = (userData.depositWallet || 0) - plan.price;
+      const investmentId = "inv_" + Date.now();
+
+      // Check if this user already made a purchase before (for referral bonus eligibility)
+      const userSnap = await getDoc(doc(db, "users", uid));
+      const alreadyPurchased = userSnap.exists() && userSnap.data().firstPurchaseDone === true;
+
+      // Update user
+      await updateDoc(doc(db, "users", uid), {
+        depositWallet: newBalance,
+        totalInvested: increment(plan.price),
+        activePlansCount: increment(1),
+        firstPurchaseDone: true
+      });
+
+      // Create investment
+      await setDoc(doc(db, "users", uid, "investments", investmentId), {
+        planId: plan.id, planName: plan.name,
+        amount: plan.price, dailyEarning: plan.daily,
+        totalIncome: plan.total, duration: plan.duration,
+        daysElapsed: 0, totalEarned: 0, active: true,
+        createdAt: serverTimestamp(), lastEarningDate: null
+      });
+
+      // Log transaction
+      await setDoc(doc(db, "users", uid, "transactions", investmentId), {
+        type: "invest", amount: plan.price,
+        description: plan.name + " Plan Purchase",
+        timestamp: serverTimestamp()
+      });
+
+      // Update recent transactions cache
+      await updateRecentTxCache(uid, {
+        type: "invest", amount: plan.price,
+        description: plan.name + " Plan Purchase",
+        timestamp: { seconds: Math.floor(Date.now() / 1000) }
+      });
+
+      // Add to active investments list
+      const activeSnap = await getDoc(doc(db, "users", uid, "investments", "active_list"));
+      let activeIds = [];
+      if (activeSnap.exists()) activeIds = activeSnap.data().activeIds || [];
+      activeIds.push(investmentId);
+      await setDoc(doc(db, "users", uid, "investments", "active_list"), { activeIds });
+
+      // ── Referral Bonus: ONLY on FIRST purchase ─────
+      let referralResult = { credited: false, details: "" };
+      if (!alreadyPurchased) {
+        referralResult = await processReferralBonuses(uid, plan.price);
+      }
+
+      // Update local
+      userData.depositWallet = newBalance;
+      userData.totalInvested = (userData.totalInvested || 0) + plan.price;
+      userData.activePlansCount = (userData.activePlansCount || 0) + 1;
+      userData.firstPurchaseDone = true;
+      document.getElementById("miniWallet").textContent = formatNaira(newBalance);
+
+      closeModal("confirmModal");
+
+      const referralAlert = document.getElementById("referralAlert");
+      const referralDetail = document.getElementById("referralDetail");
+      const successMsg = document.getElementById("successMessage");
+
+      if (referralResult.credited) {
+        referralAlert.style.display = "block";
+        referralDetail.textContent = referralResult.details || "Your uplines have been credited with referral bonuses.";
+        successMsg.textContent = "Your " + plan.name + " plan has been activated. Referral bonuses sent!";
+      } else if (alreadyPurchased) {
+        referralAlert.style.display = "none";
+        successMsg.textContent = "Your " + plan.name + " plan has been activated. (Referral bonus already paid on first purchase)";
+      } else {
+        referralAlert.style.display = "none";
+        successMsg.textContent = "Your " + plan.name + " plan has been activated successfully.";
+      }
+
+      document.getElementById("successModal").classList.add("active");
+      renderPlans(newBalance);
+
+    } catch (err) {
+      console.error("Purchase error:", err);
+      flashToast("Purchase failed. Try again.", "error");
+    } finally {
+      confirmBtn.disabled = false;
+      confirmBtn.classList.remove("loading");
+    }
+  }
+
+  // ── Update Recent Tx Cache ────────────────────────
+  async function updateRecentTxCache(uid, tx) {
+    try {
+      const ref = doc(db, "users", uid, "transactions", "recent");
+      const snap = await getDoc(ref);
+      let items = snap.exists() ? (snap.data().items || []) : [];
+      items.unshift(tx);
+      if (items.length > 20) items = items.slice(0, 20);
+      await setDoc(ref, { items });
+    } catch (err) { console.error("Cache error:", err); }
+  }
+
+  // ── Process Referral Bonuses (CREDITS WITHDRAWAL WALLET) ──
+  async function processReferralBonuses(uid, planPrice) {
+    const result = { credited: false, details: "" };
+    try {
+      const userSnap = await getDoc(doc(db, "users", uid));
+      if (!userSnap.exists()) return result;
+      const referredBy = userSnap.data().referredBy;
+      if (!referredBy) return result;
+
+      const username = userSnap.data().username || "user";
+
+      // Level 1 (22%) → withdrawal wallet
+      const l1Bonus = Math.floor(planPrice * REFERRAL_BONUS.level1);
+      await creditUplineWithdrawal(referredBy, l1Bonus, "Level 1 Referral Bonus from @" + username, uid, username);
+      result.credited = true;
+      result.details = `Level 1: ${formatNaira(l1Bonus)} sent`;
+
+      // Level 2 (2%)
+      const l1Snap = await getDoc(doc(db, "users", referredBy));
+      if (l1Snap.exists()) {
+        const l2Uid = l1Snap.data().referredBy;
+        if (l2Uid) {
+          const l2Bonus = Math.floor(planPrice * REFERRAL_BONUS.level2);
+          await creditUplineWithdrawal(l2Uid, l2Bonus, "Level 2 Referral Bonus from @" + username, uid, username);
+          result.details += ` | Level 2: ${formatNaira(l2Bonus)} sent`;
+
+          // Level 3 (1%)
+          const l2Snap = await getDoc(doc(db, "users", l2Uid));
+          if (l2Snap.exists()) {
+            const l3Uid = l2Snap.data().referredBy;
+            if (l3Uid) {
+              const l3Bonus = Math.floor(planPrice * REFERRAL_BONUS.level3);
+              await creditUplineWithdrawal(l3Uid, l3Bonus, "Level 3 Referral Bonus from @" + username, uid, username);
+              result.details += ` | Level 3: ${formatNaira(l3Bonus)} sent`;
+            }
+          }
+        }
+      }
+    } catch (err) { console.error("Referral bonus error:", err); }
+    return result;
+  }
+
+  // ── Credit Upline's WITHDRAWAL Wallet ─────────────
+  async function creditUplineWithdrawal(uplineUid, amount, description, downlineUid, downlineUsername) {
+    try {
+      const bonusId = "ref_bonus_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6);
+
+      // Credit to WITHDRAWAL wallet (not deposit)
+      await updateDoc(doc(db, "users", uplineUid), {
+        withdrawalWallet: increment(amount),
+        referralEarnings: increment(amount),
+        totalEarnings: increment(amount)
+      });
+
+      // Log transaction
+      await setDoc(doc(db, "users", uplineUid, "transactions", bonusId), {
+        type: "referral_bonus", amount: amount,
+        description: description,
+        fromUid: downlineUid, fromUser: downlineUsername,
+        timestamp: serverTimestamp()
+      });
+
+      // Update upline's recent tx cache
+      await updateRecentTxCache(uplineUid, {
+        type: "referral_bonus", amount: amount,
+        description: description,
+        timestamp: { seconds: Math.floor(Date.now() / 1000) }
+      });
+
+      // Track bonus per downline
+      const bonusTrackRef = doc(db, "users", uplineUid, "referrals", "bonuses", downlineUid);
+      const bonusTrackSnap = await getDoc(bonusTrackRef);
+      const currentTotal = bonusTrackSnap.exists() ? (bonusTrackSnap.data().totalBonus || 0) : 0;
+      await setDoc(bonusTrackRef, { totalBonus: currentTotal + amount, lastBonusAt: serverTimestamp() });
+
+      console.log(`✅ Credited ${formatNaira(amount)} to withdrawal wallet of ${uplineUid}`);
+    } catch (err) { console.error("Credit error:", err); }
+  }
+
+  // ── Auth & Init ───────────────────────────────────
+  onAuthStateChanged(auth, async user => {
+    if (!user) { window.location.href = "login.html"; return; }
+    currentUser = user;
+    try {
+      const snap = await getDoc(doc(db, "users", user.uid));
+      if (!snap.exists()) { flashToast("Account not found.", "error"); return; }
+      userData = snap.data();
+      document.getElementById("miniWallet").textContent = formatNaira(userData.depositWallet || 0);
+      renderPlans(userData.depositWallet || 0);
+    } catch (err) { console.error("Init error:", err); flashToast("Failed to load plans.", "error"); }
+  });
+
+  document.getElementById("confirmInvestBtn").addEventListener("click", processPurchase);
+  console.log("⚡ Covix Investment — Ready");
+</script>
+</body>
+</html>

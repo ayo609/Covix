@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>COVIX — Admin Settings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #020510; --surface: #080d18; --surface-2: #0f1625; --surface-3: #161e30;
+    --primary: #7c3aed; --primary-light: #a78bfa; --primary-dark: #5b21b6;
+    --primary-glow: rgba(124,58,237,0.4); --accent: #06b6d4;
+    --text: #e2e8f0; --text-bright: #ffffff; --muted: #6b7280;
+    --success: #10b981; --warning: #f59e0b; --error: #ef4444;
+    --gold: #f59e0b; --border: rgba(255,255,255,0.06);
+    --shadow-card: 0 4px 32px rgba(0,0,0,0.5);
+    --radius-lg: 22px; --radius-md: 14px; --radius-pill: 50px; --radius-sm: 10px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'DM Sans', sans-serif; min-height: 100vh;
+    overflow-x: hidden; position: relative;
+  }
+  .bg-glow {
+    position: fixed; pointer-events: none; z-index: 0;
+    border-radius: 50%; filter: blur(80px); opacity: 0.15;
+  }
+  .glow-1 { width: 280px; height: 280px; background: rgba(239,68,68,0.08); top: -60px; right: -50px; }
+  .glow-2 { width: 220px; height: 220px; background: rgba(124,58,237,0.08); bottom: -50px; left: -40px; }
+
+  .page-container {
+    position: relative; z-index: 1; max-width: 800px; margin: 0 auto;
+    padding: 20px 14px 100px; animation: fadeIn 0.5s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; gap: 12px; }
+  .back-btn {
+    display: flex; align-items: center; gap: 5px;
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: var(--radius-pill); padding: 9px 16px;
+    color: var(--muted); font-size: 12px; cursor: pointer;
+    text-decoration: none; transition: all 0.25s;
+  }
+  .back-btn:hover { border-color: var(--primary); color: #fff; }
+  .page-title { font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 700; color: var(--text-bright); }
+
+  /* Settings Section */
+  .settings-section {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 20px; margin-bottom: 16px;
+  }
+  .settings-section h3 {
+    font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700;
+    color: var(--text-bright); margin-bottom: 4px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .settings-section .section-desc {
+    font-size: 11px; color: var(--muted); margin-bottom: 16px;
+  }
+
+  /* Setting Row */
+  .setting-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 0; border-bottom: 1px solid var(--border);
+    gap: 12px; flex-wrap: wrap;
+  }
+  .setting-row:last-child { border-bottom: none; }
+  .setting-info { flex: 1; min-width: 150px; }
+  .setting-info .setting-label { font-size: 13px; font-weight: 600; color: var(--text-bright); }
+  .setting-info .setting-hint { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+  .setting-input {
+    width: 140px; background: var(--surface-2); border: 1.5px solid var(--border);
+    border-radius: var(--radius-pill); padding: 10px 16px;
+    color: var(--text-bright); font-size: 13px; font-family: 'DM Sans', sans-serif;
+    outline: none; transition: all 0.25s; text-align: center;
+  }
+  .setting-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(124,58,237,0.1); }
+  .setting-input.small { width: 90px; }
+  .setting-input[type="time"] { width: 130px; }
+  .setting-input[type="number"] { -moz-appearance: textfield; }
+  .setting-input::-webkit-outer-spin-button,
+  .setting-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+  .setting-row .input-group { display: flex; gap: 8px; align-items: center; }
+  .input-group span { font-size: 12px; color: var(--muted); }
+
+  .save-btn {
+    padding: 10px 20px; background: var(--primary); border: none;
+    border-radius: var(--radius-pill); color: #fff;
+    font-family: 'Space Grotesk', sans-serif; font-size: 12px;
+    font-weight: 700; cursor: pointer; transition: all 0.3s;
+    box-shadow: 0 4px 16px var(--primary-glow);
+  }
+  .save-btn:hover { background: var(--primary-dark); }
+  .save-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* Plan Editor */
+  .plan-editor {
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 14px; margin-top: 8px;
+  }
+  .plan-editor h4 { font-size: 12px; font-weight: 700; color: var(--text-bright); margin-bottom: 10px; }
+  .plan-row {
+    display: grid; grid-template-columns: 1fr 100px 100px 80px 60px;
+    gap: 6px; margin-bottom: 6px; align-items: center;
+  }
+  .plan-row input {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-pill); padding: 8px 12px;
+    color: #fff; font-size: 11px; font-family: 'DM Sans', sans-serif;
+    outline: none; text-align: center;
+  }
+  .plan-row input:focus { border-color: var(--primary); }
+  .plan-row input:first-child { text-align: left; }
+  .plan-row .plan-name-input { text-align: left; }
+  .plan-header {
+    display: grid; grid-template-columns: 1fr 100px 100px 80px 60px;
+    gap: 6px; margin-bottom: 6px; padding: 0 8px;
+  }
+  .plan-header span {
+    font-size: 9px; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.4px;
+  }
+
+  /* Admin Profile */
+  .profile-section {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 20px; margin-bottom: 16px;
+  }
+  .profile-section h3 {
+    font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700;
+    color: var(--text-bright); margin-bottom: 4px;
+  }
+  .profile-section .section-desc { font-size: 11px; color: var(--muted); margin-bottom: 16px; }
+
+  .toast-zone { position: fixed; top: 16px; right: 16px; z-index: 200; display: flex; flex-direction: column; gap: 8px; width: calc(100% - 32px); max-width: 380px; }
+  .toast-item { background: var(--surface-3); border: 1px solid var(--border); padding: 12px 14px; border-radius: var(--radius-md); font-size: 12px; box-shadow: var(--shadow-card); animation: toastSlide 0.4s ease; display: flex; align-items: center; gap: 8px; font-weight: 500; }
+  .toast-item.error { border-left: 4px solid var(--error); }
+  .toast-item.success { border-left: 4px solid var(--success); }
+  .toast-emoji { font-size: 15px; flex: none; }
+  @keyframes toastSlide { from { opacity: 0; transform: translateX(80px); } to { opacity: 1; transform: translateX(0); } }
+
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--surface); border-top: 1px solid var(--border);
+    display: flex; justify-content: space-around;
+    padding: 8px 0 env(safe-area-inset-bottom,8px);
+    z-index: 100; box-shadow: 0 -5px 25px rgba(0,0,0,0.4);
+  }
+  .nav-item {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    color: var(--muted); text-decoration: none; font-size: 9px; font-weight: 600;
+    padding: 5px 12px; border-radius: 50px; transition: all 0.25s;
+  }
+  .nav-item.active { color: #dc2626; }
+  .nav-item svg { width: 18px; height: 18px; }
+
+  @media (max-width: 600px) {
+    .setting-row { flex-direction: column; align-items: flex-start; }
+    .setting-input { width: 100%; }
+    .plan-row { grid-template-columns: 1fr 80px 80px 60px 50px; gap: 4px; }
+    .plan-row input { padding: 8px 6px; font-size: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-glow glow-1"></div>
+<div class="bg-glow glow-2"></div>
+<div class="toast-zone" id="toastZone"></div>
+
+<div class="page-container">
+  <div class="top-bar">
+    <a href="admin-dashboard.html" class="back-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>
+      Back
+    </a>
+    <span class="page-title">Settings</span>
+    <div></div>
+  </div>
+
+  <!-- Withdrawal Settings -->
+  <div class="settings-section">
+    <h3>💸 Withdrawal Settings</h3>
+    <p class="section-desc">Configure withdrawal rules and fees</p>
+
+    <div class="setting-row">
+      <div class="setting-info">
+        <div class="setting-label">Minimum Withdrawal</div>
+        <div class="setting-hint">Lowest amount a user can withdraw</div>
+      </div>
+      <div class="input-group">
+        <span>₦</span>
+        <input type="number" class="setting-input" id="minWithdrawal" value="1500">
+      </div>
+    </div>
+
+    <div class="setting-row">
+      <div class="setting-info">
+        <div class="setting-label">Withdrawal Fee (%)</div>
+        <div class="setting-hint">Percentage deducted from withdrawals</div>
+      </div>
+      <div class="input-group">
+        <input type="number" class="setting-input small" id="withdrawalFee" value="15" min="0" max="100">
+        <span>%</span>
+      </div>
+    </div>
+
+    <div class="setting-row">
+      <div class="setting-info">
+        <div class="setting-label">Withdrawal Start Time</div>
+        <div class="setting-hint">When withdrawals open daily</div>
+      </div>
+      <input type="time" class="setting-input" id="withdrawalStart" value="08:00">
+    </div>
+
+    <div class="setting-row">
+      <div class="setting-info">
+        <div class="setting-label">Withdrawal End Time</div>
+        <div class="setting-hint">When withdrawals close daily</div>
+      </div>
+      <input type="time" class="setting-input" id="withdrawalEnd" value="17:00">
+    </div>
+
+    <div class="setting-row">
+      <div class="setting-info">
+        <div class="setting-label">Closed Days</div>
+        <div class="setting-hint">Days withdrawals are not processed</div>
+      </div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;">
+        <label style="font-size:10px;color:var(--muted);display:flex;align-items:center;gap:4px;"><input type="checkbox" id="daySun" checked> Sun</label>
+        <label style="font-size:10px;color:var(--muted);display:flex;align-items:center;gap:4px;"><input type="checkbox" id="dayMon"> Mon</label>
+        <label style="font-size:10px;color:var(--muted);display:flex;align-items:center;gap:4px;"><input type="checkbox" id="dayTue"> Tue</label>
+        <label style="font-size:10px;color:var(--muted);display:flex;align-items:center;gap:4px;"><input type="checkbox" id="dayWed"> Wed</label>
+        <label style="font-size:10px;color:var(--muted);display:flex;align-items:center;gap:4px;"><input type="checkbox" id="dayThu"> Thu</label>
+        <label style="font-size:10px;color:var(--muted);display:flex;align-items:center;gap:4px;"><input type="checkbox" id="dayFri"> Fri</label>
+        <label style="font-size:10px;color:var(--muted);display:flex;align-items:center;gap:4px;"><input type="checkbox" id="daySat"> Sat</label>
+      </div>
+    </div>
+
+    <div style="margin-top:12px;">
+      <button class="save-btn" id="saveWithdrawalSettings">💾 Save Withdrawal Settings</button>
+    </div>
+  </div>
+
+  <!-- Referral Settings -->
+  <div class="settings-section">
+    <h3>👥 Referral Bonus Settings</h3>
+    <p class="section-desc">Set bonus percentages for each level</p>
+
+    <div class="setting-row">
+      <div class="setting-info">
+        <div class="setting-label">Level 1 (Direct) Bonus</div>
+        <div class="setting-hint">For direct referrals</div>
+      </div>
+      <div class="input-group">
+        <input type="number" class="setting-input small" id="refLevel1" value="22" min="0" max="100">
+        <span>%</span>
+      </div>
+    </div>
+
+    <div class="setting-row">
+      <div class="setting-info">
+        <div class="setting-label">Level 2 (Indirect) Bonus</div>
+        <div class="setting-hint">For referrals of referrals</div>
+      </div>
+      <div class="input-group">
+        <input type="number" class="setting-input small" id="refLevel2" value="2" min="0" max="100">
+        <span>%</span>
+      </div>
+    </div>
+
+    <div class="setting-row">
+      <div class="setting-info">
+        <div class="setting-label">Level 3 (Indirect) Bonus</div>
+        <div class="setting-hint">For deep indirect referrals</div>
+      </div>
+      <div class="input-group">
+        <input type="number" class="setting-input small" id="refLevel3" value="1" min="0" max="100">
+        <span>%</span>
+      </div>
+    </div>
+
+    <div style="margin-top:12px;">
+      <button class="save-btn" id="saveReferralSettings">💾 Save Referral Settings</button>
+    </div>
+  </div>
+
+  <!-- Welcome Bonus -->
+  <div class="settings-section">
+    <h3>🎁 Welcome Bonus</h3>
+    <p class="section-desc">Amount credited to new users on registration</p>
+
+    <div class="setting-row">
+      <div class="setting-info">
+        <div class="setting-label">Welcome Bonus Amount</div>
+        <div class="setting-hint">Credited to deposit wallet on signup</div>
+      </div>
+      <div class="input-group">
+        <span>₦</span>
+        <input type="number" class="setting-input" id="welcomeBonus" value="1000">
+      </div>
+    </div>
+
+    <div style="margin-top:12px;">
+      <button class="save-btn" id="saveWelcomeBonus">💾 Save Welcome Bonus</button>
+    </div>
+  </div>
+
+  <!-- Investment Plans Editor -->
+  <div class="settings-section">
+    <h3>📈 Investment Plans</h3>
+    <p class="section-desc">Edit plan details (prices in Naira)</p>
+    <div class="plan-editor" id="planEditor">
+      <div class="plan-header">
+        <span>Plan Name</span><span>Price (₦)</span><span>Daily ROI (₦)</span><span>Total (₦)</span><span>Days</span>
+      </div>
+      <div id="planRows"></div>
+    </div>
+    <div style="margin-top:12px;">
+      <button class="save-btn" id="savePlans">💾 Save All Plans</button>
+    </div>
+  </div>
+
+  <!-- Admin Profile -->
+  <div class="profile-section">
+    <h3>🔐 Admin Profile</h3>
+    <p class="section-desc">Update your admin account details</p>
+
+    <div class="setting-row">
+      <div class="setting-info">
+        <div class="setting-label">Admin Name</div>
+        <div class="setting-hint">Your display name</div>
+      </div>
+      <input type="text" class="setting-input" id="adminName" placeholder="Admin Name">
+    </div>
+
+    <div class="setting-row">
+      <div class="setting-info">
+        <div class="setting-label">New Password</div>
+        <div class="setting-hint">Leave blank to keep current</div>
+      </div>
+      <input type="password" class="setting-input" id="adminPassword" placeholder="New password">
+    </div>
+
+    <div style="margin-top:12px;">
+      <button class="save-btn" id="saveAdminProfile">💾 Update Profile</button>
+    </div>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <a href="admin-dashboard.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+  <a href="admin-users.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/></svg>Users</a>
+  <a href="admin-deposits.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Deposits</a>
+  <a href="admin-withdrawals.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12h14"/></svg>Withdrawals</a>
+  <a href="admin-settings.html" class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/></svg>Settings</a>
+</nav>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut, updatePassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBjANH3YIecQIuVh4KOrHSA2JSVE0MVFdw",
+    authDomain: "covix-1f7d2.firebaseapp.com",
+    projectId: "covix-1f7d2",
+    storageBucket: "covix-1f7d2.firebasestorage.app",
+    messagingSenderId: "550748233984",
+    appId: "1:550748233984:web:ff2a36a3f601731a4ad3e5"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  let currentAdmin = null;
+
+  const defaultPlans = [
+    { id: "starter", name: "Starter", price: 3000, daily: 950, total: 38000, duration: 40 },
+    { id: "bronze", name: "Bronze", price: 5000, daily: 1660, total: 66400, duration: 40 },
+    { id: "silver", name: "Silver", price: 10000, daily: 3320, total: 132800, duration: 40 },
+    { id: "gold", name: "Gold", price: 20000, daily: 6640, total: 265600, duration: 40 },
+    { id: "platinum", name: "Platinum", price: 30000, daily: 9960, total: 398400, duration: 40 },
+    { id: "diamond", name: "Diamond", price: 50000, daily: 16600, total: 664000, duration: 40 },
+    { id: "elite", name: "Elite", price: 100000, daily: 33200, total: 1328000, duration: 40 },
+    { id: "royal", name: "Royal", price: 200000, daily: 66400, total: 2656000, duration: 40 },
+    { id: "prestige", name: "Prestige", price: 400000, daily: 133800, total: 5312000, duration: 40 },
+    { id: "imperial", name: "Imperial", price: 600000, daily: 215000, total: 8600000, duration: 40 },
+    { id: "legend", name: "Legend", price: 1000000, daily: 400000, total: 16000000, duration: 40 }
+  ];
+
+  function toast(msg, type = "info") {
+    const zone = document.getElementById("toastZone");
+    const item = document.createElement("div");
+    item.className = `toast-item ${type}`;
+    const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+    item.innerHTML = `<span class="toast-emoji">${icons[type]||icons.info}</span>${msg}`;
+    if (zone.children.length >= 3) zone.removeChild(zone.firstChild);
+    zone.appendChild(item);
+    setTimeout(() => { item.style.opacity="0"; item.style.transform="translateX(80px)"; item.style.transition="all 0.3s"; setTimeout(() => item.remove(), 300); }, 4000);
+  }
+
+  // ── Load Settings ─────────────────────────────────
+  async function loadSettings() {
+    try {
+      const snap = await getDoc(doc(db, "settings", "system"));
+      if (snap.exists()) {
+        const s = snap.data();
+
+        // Withdrawal settings
+        document.getElementById("minWithdrawal").value = s.minWithdrawal || 1500;
+        document.getElementById("withdrawalFee").value = s.withdrawalFee || 15;
+        document.getElementById("withdrawalStart").value = s.withdrawalStart || "08:00";
+        document.getElementById("withdrawalEnd").value = s.withdrawalEnd || "17:00";
+
+        const closedDays = s.closedDays || [0]; // Default Sunday
+        document.getElementById("daySun").checked = closedDays.includes(0);
+        document.getElementById("dayMon").checked = closedDays.includes(1);
+        document.getElementById("dayTue").checked = closedDays.includes(2);
+        document.getElementById("dayWed").checked = closedDays.includes(3);
+        document.getElementById("dayThu").checked = closedDays.includes(4);
+        document.getElementById("dayFri").checked = closedDays.includes(5);
+        document.getElementById("daySat").checked = closedDays.includes(6);
+
+        // Referral settings
+        document.getElementById("refLevel1").value = s.refLevel1 || 22;
+        document.getElementById("refLevel2").value = s.refLevel2 || 2;
+        document.getElementById("refLevel3").value = s.refLevel3 || 1;
+
+        // Welcome bonus
+        document.getElementById("welcomeBonus").value = s.welcomeBonus || 1000;
+
+        // Plans
+        if (s.plans && s.plans.length) {
+          renderPlanRows(s.plans);
+        } else {
+          renderPlanRows(defaultPlans);
+        }
+      } else {
+        // No settings yet, use defaults
+        renderPlanRows(defaultPlans);
+      }
+
+      // Admin name
+      if (currentAdmin) {
+        document.getElementById("adminName").value = currentAdmin.name || "";
+      }
+
+    } catch (err) {
+      console.error("Load settings error:", err);
+      renderPlanRows(defaultPlans);
+    }
+  }
+
+  // ── Render Plan Rows ──────────────────────────────
+  function renderPlanRows(plans) {
+    const container = document.getElementById("planRows");
+    container.innerHTML = plans.map((p, i) => `
+      <div class="plan-row">
+        <input type="text" class="plan-name-input" value="${p.name}" data-index="${i}" data-field="name" placeholder="Plan name">
+        <input type="number" value="${p.price}" data-index="${i}" data-field="price" placeholder="Price">
+        <input type="number" value="${p.daily}" data-index="${i}" data-field="daily" placeholder="Daily ROI">
+        <input type="number" value="${p.total}" data-index="${i}" data-field="total" placeholder="Total">
+        <input type="number" value="${p.duration}" data-index="${i}" data-field="duration" placeholder="Days">
+      </div>
+    `).join("");
+  }
+
+  function getPlanData() {
+    const rows = document.querySelectorAll("#planRows .plan-row");
+    const plans = [];
+    rows.forEach(row => {
+      const inputs = row.querySelectorAll("input");
+      const nameInput = row.querySelector(".plan-name-input");
+      plans.push({
+        id: nameInput.value.toLowerCase().replace(/\s+/g, "_"),
+        name: nameInput.value,
+        price: parseInt(inputs[1].value) || 0,
+        daily: parseInt(inputs[2].value) || 0,
+        total: parseInt(inputs[3].value) || 0,
+        duration: parseInt(inputs[4].value) || 40,
+        tier: plans.length + 1
+      });
+    });
+    return plans;
+  }
+
+  // ── Save Withdrawal Settings ──────────────────────
+  document.getElementById("saveWithdrawalSettings").addEventListener("click", async () => {
+    const btn = document.getElementById("saveWithdrawalSettings");
+    btn.disabled = true;
+    btn.textContent = "Saving...";
+
+    const closedDays = [];
+    if (document.getElementById("daySun").checked) closedDays.push(0);
+    if (document.getElementById("dayMon").checked) closedDays.push(1);
+    if (document.getElementById("dayTue").checked) closedDays.push(2);
+    if (document.getElementById("dayWed").checked) closedDays.push(3);
+    if (document.getElementById("dayThu").checked) closedDays.push(4);
+    if (document.getElementById("dayFri").checked) closedDays.push(5);
+    if (document.getElementById("daySat").checked) closedDays.push(6);
+
+    try {
+      await setDoc(doc(db, "settings", "system"), {
+        minWithdrawal: parseInt(document.getElementById("minWithdrawal").value) || 1500,
+        withdrawalFee: parseInt(document.getElementById("withdrawalFee").value) || 15,
+        withdrawalStart: document.getElementById("withdrawalStart").value,
+        withdrawalEnd: document.getElementById("withdrawalEnd").value,
+        closedDays
+      }, { merge: true });
+
+      toast("Withdrawal settings saved!", "success");
+    } catch (err) {
+      console.error(err);
+      toast("Failed to save.", "error");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "💾 Save Withdrawal Settings";
+    }
+  });
+
+  // ── Save Referral Settings ────────────────────────
+  document.getElementById("saveReferralSettings").addEventListener("click", async () => {
+    const btn = document.getElementById("saveReferralSettings");
+    btn.disabled = true;
+    btn.textContent = "Saving...";
+
+    try {
+      await setDoc(doc(db, "settings", "system"), {
+        refLevel1: parseInt(document.getElementById("refLevel1").value) || 22,
+        refLevel2: parseInt(document.getElementById("refLevel2").value) || 2,
+        refLevel3: parseInt(document.getElementById("refLevel3").value) || 1
+      }, { merge: true });
+
+      toast("Referral settings saved!", "success");
+    } catch (err) {
+      console.error(err);
+      toast("Failed to save.", "error");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "💾 Save Referral Settings";
+    }
+  });
+
+  // ── Save Welcome Bonus ────────────────────────────
+  document.getElementById("saveWelcomeBonus").addEventListener("click", async () => {
+    const btn = document.getElementById("saveWelcomeBonus");
+    btn.disabled = true;
+    btn.textContent = "Saving...";
+
+    try {
+      await setDoc(doc(db, "settings", "system"), {
+        welcomeBonus: parseInt(document.getElementById("welcomeBonus").value) || 1000
+      }, { merge: true });
+
+      toast("Welcome bonus saved!", "success");
+    } catch (err) {
+      console.error(err);
+      toast("Failed to save.", "error");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "💾 Save Welcome Bonus";
+    }
+  });
+
+  // ── Save Plans ────────────────────────────────────
+  document.getElementById("savePlans").addEventListener("click", async () => {
+    const btn = document.getElementById("savePlans");
+    btn.disabled = true;
+    btn.textContent = "Saving...";
+
+    try {
+      const plans = getPlanData();
+      await setDoc(doc(db, "settings", "system"), { plans }, { merge: true });
+      toast(`${plans.length} plans saved!`, "success");
+    } catch (err) {
+      console.error(err);
+      toast("Failed to save plans.", "error");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "💾 Save All Plans";
+    }
+  });
+
+  // ── Save Admin Profile ────────────────────────────
+  document.getElementById("saveAdminProfile").addEventListener("click", async () => {
+    const btn = document.getElementById("saveAdminProfile");
+    btn.disabled = true;
+    btn.textContent = "Saving...";
+
+    try {
+      const name = document.getElementById("adminName").value.trim();
+      const password = document.getElementById("adminPassword").value;
+
+      if (name && currentAdmin) {
+        await updateDoc(doc(db, "admins", currentAdmin.uid), { name });
+      }
+
+      if (password && auth.currentUser) {
+        await updatePassword(auth.currentUser, password);
+      }
+
+      document.getElementById("adminPassword").value = "";
+      toast("Profile updated!", "success");
+    } catch (err) {
+      console.error(err);
+      if (err.code === "auth/requires-recent-login") {
+        toast("Please log out and log in again to change password.", "error");
+      } else {
+        toast("Failed to update profile.", "error");
+      }
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "💾 Update Profile";
+    }
+  });
+
+  // ── Auth ──────────────────────────────────────────
+  onAuthStateChanged(auth, async user => {
+    if (!user) { window.location.href = "admin-login.html"; return; }
+    const adminSnap = await getDoc(doc(db, "admins", user.uid));
+    if (!adminSnap.exists()) { await signOut(auth); window.location.href = "admin-login.html"; return; }
+    currentAdmin = { uid: user.uid, ...adminSnap.data() };
+    loadSettings();
+  });
+
+  console.log("⚙️ Covix Admin Settings — Ready");
+</script>
+</body>
+</html>

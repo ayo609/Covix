@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>COVIX — Admin Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #020510; --surface: #080d18; --surface-2: #0f1625; --surface-3: #161e30;
+    --primary: #7c3aed; --primary-light: #a78bfa; --primary-dark: #5b21b6;
+    --primary-glow: rgba(124,58,237,0.4); --accent: #06b6d4;
+    --text: #e2e8f0; --text-bright: #ffffff; --muted: #6b7280;
+    --success: #10b981; --warning: #f59e0b; --error: #ef4444;
+    --gold: #f59e0b; --border: rgba(255,255,255,0.06);
+    --shadow-card: 0 4px 32px rgba(0,0,0,0.5);
+    --radius-lg: 22px; --radius-md: 14px; --radius-pill: 50px; --radius-sm: 10px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'DM Sans', sans-serif; min-height: 100vh;
+    overflow-x: hidden; position: relative;
+  }
+  .bg-glow {
+    position: fixed; pointer-events: none; z-index: 0;
+    border-radius: 50%; filter: blur(80px); opacity: 0.15;
+  }
+  .glow-1 { width: 300px; height: 300px; background: rgba(220,38,38,0.12); top: -80px; right: -60px; }
+  .glow-2 { width: 250px; height: 250px; background: rgba(124,58,237,0.1); bottom: -60px; left: -50px; }
+
+  .page-container {
+    position: relative; z-index: 1; max-width: 1000px; margin: 0 auto;
+    padding: 20px 14px 100px; animation: fadeIn 0.5s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  /* Top Bar */
+  .top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; gap: 12px; }
+  .admin-info { display: flex; align-items: center; gap: 10px; }
+  .admin-avatar {
+    width: 42px; height: 42px; border-radius: 50%;
+    background: linear-gradient(135deg, #dc2626, var(--primary));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 800;
+    color: #fff; box-shadow: 0 4px 16px rgba(220,38,38,0.3);
+  }
+  .admin-info h3 { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700; color: var(--text-bright); }
+  .admin-info p { font-size: 11px; color: #dc2626; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+  .logout-btn {
+    padding: 9px 16px; background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: var(--radius-pill); color: var(--muted); font-size: 12px;
+    cursor: pointer; transition: all 0.25s; display: flex; align-items: center; gap: 5px;
+  }
+  .logout-btn:hover { border-color: var(--error); color: var(--error); background: rgba(239,68,68,0.08); }
+
+  /* Page Title */
+  .page-title {
+    font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 700;
+    color: var(--text-bright); margin-bottom: 16px;
+  }
+
+  /* Stats Grid */
+  .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 20px; }
+  .stat-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 16px;
+    box-shadow: var(--shadow-card);
+  }
+  .stat-card .stat-icon {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; margin-bottom: 8px;
+  }
+  .stat-card .stat-icon.users { background: rgba(124,58,237,0.15); }
+  .stat-card .stat-icon.deposits { background: rgba(16,185,129,0.15); }
+  .stat-card .stat-icon.withdrawals { background: rgba(6,182,212,0.15); }
+  .stat-card .stat-icon.investments { background: rgba(245,158,11,0.15); }
+  .stat-value { font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; color: var(--text-bright); }
+  .stat-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+
+  /* Pending Alerts */
+  .alert-row { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin-bottom: 20px; }
+  .alert-card {
+    padding: 14px 16px; border-radius: var(--radius-md);
+    display: flex; align-items: center; justify-content: space-between;
+    text-decoration: none; transition: all 0.25s;
+  }
+  .alert-card:hover { transform: translateY(-2px); }
+  .alert-card.pending-deposits {
+    background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2);
+  }
+  .alert-card.pending-withdrawals {
+    background: rgba(6,182,212,0.08); border: 1px solid rgba(6,182,212,0.2);
+  }
+  .alert-text h4 { font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 700; }
+  .alert-card.pending-deposits .alert-text h4 { color: var(--success); }
+  .alert-card.pending-withdrawals .alert-text h4 { color: var(--accent); }
+  .alert-text p { font-size: 10px; color: var(--muted); }
+  .alert-count {
+    font-family: 'Space Grotesk', sans-serif; font-size: 24px; font-weight: 700;
+  }
+  .alert-card.pending-deposits .alert-count { color: var(--success); }
+  .alert-card.pending-withdrawals .alert-count { color: var(--accent); }
+
+  /* Action Cards */
+  .section-title {
+    font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700;
+    color: var(--text-bright); margin-bottom: 12px;
+  }
+  .actions-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin-bottom: 20px; }
+  .action-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 18px 16px;
+    cursor: pointer; transition: all 0.25s; text-decoration: none; color: var(--text);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .action-card:hover { border-color: var(--primary); background: var(--surface-2); transform: translateY(-2px); }
+  .action-icon {
+    width: 44px; height: 44px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex: none; font-size: 20px;
+  }
+  .action-icon.manage-users { background: rgba(124,58,237,0.15); }
+  .action-icon.approve-deposits { background: rgba(16,185,129,0.15); }
+  .action-icon.process-withdrawals { background: rgba(6,182,212,0.15); }
+  .action-icon.view-investments { background: rgba(245,158,11,0.15); }
+  .action-icon.settings { background: rgba(239,68,68,0.1); }
+  .action-icon.transactions { background: rgba(124,58,237,0.12); }
+  .action-text h4 { font-size: 13px; font-weight: 600; color: var(--text-bright); }
+  .action-text p { font-size: 10.5px; color: var(--muted); }
+
+  /* Clear Data Section */
+  .clear-section {
+    background: var(--surface); border: 1px solid rgba(239,68,68,0.15);
+    border-radius: var(--radius-md); padding: 18px; margin-bottom: 20px;
+  }
+  .clear-section h4 {
+    font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 700;
+    color: var(--error); margin-bottom: 6px; display: flex; align-items: center; gap: 6px;
+  }
+  .clear-section p { font-size: 11px; color: var(--muted); margin-bottom: 12px; }
+  .clear-btns { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+  .clear-btn {
+    padding: 10px 14px; background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: var(--radius-pill); color: var(--muted);
+    font-family: 'Space Grotesk', sans-serif; font-size: 11px;
+    font-weight: 600; cursor: pointer; transition: all 0.25s;
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+  }
+  .clear-btn:hover { border-color: var(--error); color: var(--error); background: rgba(239,68,68,0.05); }
+  .clear-btn.danger { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.25); color: var(--error); }
+  .clear-btn.danger:hover { background: var(--error); color: #fff; }
+
+  /* Confirm Modal */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(2,5,16,0.9); backdrop-filter: blur(8px);
+    display: none; align-items: center; justify-content: center;
+    z-index: 150; padding: 20px;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal-dialog {
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 28px 22px;
+    max-width: 420px; width: 100%; text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+    animation: popIn 0.4s cubic-bezier(0.68,-0.55,0.265,1.55);
+  }
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.85) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .modal-dialog .warn-circle {
+    width: 56px; height: 56px; border-radius: 50%;
+    margin: 0 auto 14px; display: flex; align-items: center; justify-content: center;
+    background: rgba(239,68,68,0.12);
+  }
+  .modal-dialog .warn-circle svg { color: var(--error); width: 26px; height: 26px; }
+  .modal-dialog h3 { font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+  .modal-dialog p { color: var(--muted); font-size: 12.5px; line-height: 1.5; margin-bottom: 18px; }
+  .modal-btns { display: flex; gap: 10px; }
+  .modal-btn {
+    flex: 1; padding: 12px; border: none; border-radius: var(--radius-pill);
+    font-family: 'Space Grotesk', sans-serif; font-size: 13px;
+    font-weight: 700; cursor: pointer; transition: all 0.3s;
+  }
+  .modal-btn.cancel { background: var(--surface-3); color: var(--muted); border: 1px solid var(--border); }
+  .modal-btn.cancel:hover { border-color: #fff; color: #fff; }
+  .modal-btn.danger { background: var(--error); color: #fff; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .modal-btn.danger:hover { background: #dc2626; }
+  .spin {
+    width: 16px; height: 16px; border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff; animation: spinAnim 0.7s linear infinite;
+    display: none;
+  }
+  .modal-btn.danger.loading .spin { display: inline-block; }
+  .modal-btn.danger.loading .btn-text { display: none; }
+  @keyframes spinAnim { to { transform: rotate(360deg); } }
+
+  .toast-zone { position: fixed; top: 16px; right: 16px; z-index: 200; display: flex; flex-direction: column; gap: 8px; width: calc(100% - 32px); max-width: 380px; }
+  .toast-item { background: var(--surface-3); border: 1px solid var(--border); padding: 12px 14px; border-radius: var(--radius-md); font-size: 12px; box-shadow: var(--shadow-card); animation: toastSlide 0.4s ease; display: flex; align-items: center; gap: 8px; font-weight: 500; }
+  .toast-item.error { border-left: 4px solid var(--error); }
+  .toast-item.success { border-left: 4px solid var(--success); }
+  .toast-emoji { font-size: 15px; flex: none; }
+  @keyframes toastSlide { from { opacity: 0; transform: translateX(80px); } to { opacity: 1; transform: translateX(0); } }
+
+  /* Bottom Nav */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--surface); border-top: 1px solid var(--border);
+    display: flex; justify-content: space-around;
+    padding: 8px 0 env(safe-area-inset-bottom,8px);
+    z-index: 100; box-shadow: 0 -5px 25px rgba(0,0,0,0.4);
+  }
+  .nav-item {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    color: var(--muted); text-decoration: none; font-size: 9px; font-weight: 600;
+    padding: 5px 12px; border-radius: 50px; transition: all 0.25s;
+  }
+  .nav-item.active { color: #dc2626; }
+  .nav-item svg { width: 18px; height: 18px; }
+
+  @media (max-width: 768px) {
+    .stats-grid { grid-template-columns: repeat(2,1fr); }
+    .actions-grid { grid-template-columns: 1fr; }
+    .clear-btns { grid-template-columns: 1fr; }
+    .alert-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-glow glow-1"></div>
+<div class="bg-glow glow-2"></div>
+<div class="toast-zone" id="toastZone"></div>
+
+<div class="page-container">
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="admin-info">
+      <div class="admin-avatar" id="adminAvatar">A</div>
+      <div>
+        <h3 id="adminName">Admin</h3>
+        <p>Administrator</p>
+      </div>
+    </div>
+    <button class="logout-btn" id="logoutBtn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+      Logout
+    </button>
+  </div>
+
+  <h1 class="page-title">Admin Dashboard</h1>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon users">👥</div>
+      <div class="stat-value" id="totalUsers">0</div>
+      <div class="stat-label">Total Users</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon deposits">💰</div>
+      <div class="stat-value" id="totalDeposits">₦0</div>
+      <div class="stat-label">Total Deposits</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon withdrawals">💸</div>
+      <div class="stat-value" id="totalWithdrawals">₦0</div>
+      <div class="stat-label">Total Withdrawals</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon investments">📈</div>
+      <div class="stat-value" id="totalInvestments">0</div>
+      <div class="stat-label">Active Investments</div>
+    </div>
+  </div>
+
+  <!-- Pending Alerts -->
+  <div class="alert-row">
+    <a href="admin-deposits.html" class="alert-card pending-deposits">
+      <div class="alert-text">
+        <h4>⏳ Pending Deposits</h4>
+        <p>Awaiting approval</p>
+      </div>
+      <span class="alert-count" id="pendingDeposits">0</span>
+    </a>
+    <a href="admin-withdrawals.html" class="alert-card pending-withdrawals">
+      <div class="alert-text">
+        <h4>⏳ Pending Withdrawals</h4>
+        <p>Awaiting processing</p>
+      </div>
+      <span class="alert-count" id="pendingWithdrawals">0</span>
+    </a>
+  </div>
+
+  <!-- Quick Actions -->
+  <h3 class="section-title">Management</h3>
+  <div class="actions-grid">
+    <a href="admin-users.html" class="action-card">
+      <div class="action-icon manage-users">👥</div>
+      <div class="action-text">
+        <h4>User Management</h4>
+        <p>View, edit, fund or suspend users</p>
+      </div>
+    </a>
+    <a href="admin-deposits.html" class="action-card">
+      <div class="action-icon approve-deposits">✅</div>
+      <div class="action-text">
+        <h4>Deposit Approvals</h4>
+        <p>Review receipts & approve deposits</p>
+      </div>
+    </a>
+    <a href="admin-withdrawals.html" class="action-card">
+      <div class="action-icon process-withdrawals">🏦</div>
+      <div class="action-text">
+        <h4>Withdrawal Processing</h4>
+        <p>Process or reject withdrawals</p>
+      </div>
+    </a>
+    <a href="admin-investments.html" class="action-card">
+      <div class="action-icon view-investments">📊</div>
+      <div class="action-text">
+        <h4>Investments</h4>
+        <p>View all active & completed plans</p>
+      </div>
+    </a>
+    <a href="admin-transactions.html" class="action-card">
+      <div class="action-icon transactions">📋</div>
+      <div class="action-text">
+        <h4>Transaction Logs</h4>
+        <p>Complete transaction history</p>
+      </div>
+    </a>
+    <a href="admin-settings.html" class="action-card">
+      <div class="action-icon settings">⚙️</div>
+      <div class="action-text">
+        <h4>Settings</h4>
+        <p>System configuration & plans</p>
+      </div>
+    </a>
+  </div>
+
+  <!-- Clear Data -->
+  <div class="clear-section">
+    <h4>⚠️ Danger Zone — Clear Data</h4>
+    <p>These actions cannot be undone. Use with caution.</p>
+    <div class="clear-btns">
+      <button class="clear-btn" id="clearDeposits">🗑️ Clear All Deposits</button>
+      <button class="clear-btn" id="clearWithdrawals">🗑️ Clear All Withdrawals</button>
+      <button class="clear-btn" id="clearInvestments">🗑️ Clear All Investments</button>
+      <button class="clear-btn" id="clearTransactions">🗑️ Clear All Transactions</button>
+      <button class="clear-btn danger" id="clearAllData">⚠️ Clear Everything</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Modal -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal-dialog">
+    <div class="warn-circle">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    </div>
+    <h3 id="confirmTitle">Confirm Action</h3>
+    <p id="confirmMsg">Are you sure you want to proceed? This cannot be undone.</p>
+    <div class="modal-btns">
+      <button class="modal-btn cancel" id="cancelBtn">Cancel</button>
+      <button class="modal-btn danger" id="confirmBtn">
+        <span class="btn-text">Confirm</span>
+        <span class="spin"></span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Navigation -->
+<nav class="bottom-nav">
+  <a href="admin-dashboard.html" class="nav-item active">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    Dashboard
+  </a>
+  <a href="admin-users.html" class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+    Users
+  </a>
+  <a href="admin-deposits.html" class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+    Deposits
+  </a>
+  <a href="admin-withdrawals.html" class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12h14"/></svg>
+    Withdrawals
+  </a>
+  <a href="admin-settings.html" class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    Settings
+  </a>
+</nav>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { getFirestore, doc, getDoc, collection, getDocs, deleteDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBjANH3YIecQIuVh4KOrHSA2JSVE0MVFdw",
+    authDomain: "covix-1f7d2.firebaseapp.com",
+    projectId: "covix-1f7d2",
+    storageBucket: "covix-1f7d2.firebasestorage.app",
+    messagingSenderId: "550748233984",
+    appId: "1:550748233984:web:ff2a36a3f601731a4ad3e5"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  let pendingAction = null;
+
+  function toast(msg, type = "info") {
+    const zone = document.getElementById("toastZone");
+    const item = document.createElement("div");
+    item.className = `toast-item ${type}`;
+    const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+    item.innerHTML = `<span class="toast-emoji">${icons[type]||icons.info}</span>${msg}`;
+    if (zone.children.length >= 3) zone.removeChild(zone.firstChild);
+    zone.appendChild(item);
+    setTimeout(() => { item.style.opacity="0"; item.style.transform="translateX(80px)"; item.style.transition="all 0.3s"; setTimeout(() => item.remove(), 300); }, 4000);
+  }
+
+  function fmtN(n) { return "₦" + Number(n||0).toLocaleString("en-NG"); }
+
+  // ── Load Dashboard Stats ──────────────────────────
+  async function loadStats() {
+    try {
+      // Count users
+      const usersSnap = await getDocs(collection(db, "users"));
+      const totalUsers = usersSnap.size;
+      document.getElementById("totalUsers").textContent = totalUsers;
+
+      // Count deposits, withdrawals, investments
+      const depositsSnap = await getDocs(collection(db, "deposits"));
+      const withdrawalsSnap = await getDocs(collection(db, "withdrawals"));
+      
+      let totalDeposits = 0, pendingDeposits = 0;
+      depositsSnap.forEach(doc => {
+        const d = doc.data();
+        totalDeposits += d.amount || 0;
+        if (d.status === "pending") pendingDeposits++;
+      });
+
+      let totalWithdrawals = 0, pendingWithdrawals = 0;
+      withdrawalsSnap.forEach(doc => {
+        const d = doc.data();
+        totalWithdrawals += d.finalAmount || d.amount || 0;
+        if (d.status === "pending") pendingWithdrawals++;
+      });
+
+      let totalInvestments = 0;
+      usersSnap.forEach(doc => {
+        totalInvestments += doc.data().activePlansCount || 0;
+      });
+
+      document.getElementById("totalDeposits").textContent = fmtN(totalDeposits);
+      document.getElementById("totalWithdrawals").textContent = fmtN(totalWithdrawals);
+      document.getElementById("totalInvestments").textContent = totalInvestments;
+      document.getElementById("pendingDeposits").textContent = pendingDeposits;
+      document.getElementById("pendingWithdrawals").textContent = pendingWithdrawals;
+
+    } catch (err) {
+      console.error("Stats error:", err);
+    }
+  }
+
+  // ── Clear Collection Helper ───────────────────────
+  async function clearCollection(collectionName) {
+    const snap = await getDocs(collection(db, collectionName));
+    const batch = writeBatch(db);
+    snap.forEach(doc => batch.delete(doc.ref));
+    await batch.commit();
+    return snap.size;
+  }
+
+  // ── Confirm Modal ─────────────────────────────────
+  function showConfirm(title, msg, action) {
+    pendingAction = action;
+    document.getElementById("confirmTitle").textContent = title;
+    document.getElementById("confirmMsg").textContent = msg;
+    document.getElementById("confirmModal").classList.add("active");
+  }
+
+  document.getElementById("cancelBtn").addEventListener("click", () => {
+    document.getElementById("confirmModal").classList.remove("active");
+    pendingAction = null;
+  });
+
+  document.getElementById("confirmModal").addEventListener("click", e => {
+    if (e.target === document.getElementById("confirmModal")) {
+      document.getElementById("confirmModal").classList.remove("active");
+      pendingAction = null;
+    }
+  });
+
+  document.getElementById("confirmBtn").addEventListener("click", async () => {
+    if (!pendingAction) return;
+    const btn = document.getElementById("confirmBtn");
+    btn.disabled = true;
+    btn.classList.add("loading");
+
+    try {
+      await pendingAction();
+      document.getElementById("confirmModal").classList.remove("active");
+      loadStats();
+    } catch (err) {
+      console.error("Action error:", err);
+      toast("Operation failed.", "error");
+    } finally {
+      btn.disabled = false;
+      btn.classList.remove("loading");
+      pendingAction = null;
+    }
+  });
+
+  // ── Clear Buttons ─────────────────────────────────
+  document.getElementById("clearDeposits").addEventListener("click", () => {
+    showConfirm("Clear All Deposits", "This will permanently delete ALL deposit records. This cannot be undone.", 
+      async () => {
+        const count = await clearCollection("deposits");
+        toast(`${count} deposit records cleared.`, "success");
+      });
+  });
+
+  document.getElementById("clearWithdrawals").addEventListener("click", () => {
+    showConfirm("Clear All Withdrawals", "This will permanently delete ALL withdrawal records. This cannot be undone.",
+      async () => {
+        const count = await clearCollection("withdrawals");
+        toast(`${count} withdrawal records cleared.`, "success");
+      });
+  });
+
+  document.getElementById("clearInvestments").addEventListener("click", () => {
+    showConfirm("Clear All Investments", "This will delete all investment records from all users. This cannot be undone.",
+      async () => {
+        const usersSnap = await getDocs(collection(db, "users"));
+        let count = 0;
+        for (const userDoc of usersSnap.docs) {
+          const invSnap = await getDocs(collection(db, "users", userDoc.id, "investments"));
+          const batch = writeBatch(db);
+          invSnap.forEach(doc => batch.delete(doc.ref));
+          await batch.commit();
+          count += invSnap.size;
+        }
+        toast(`${count} investment records cleared.`, "success");
+      });
+  });
+
+  document.getElementById("clearTransactions").addEventListener("click", () => {
+    showConfirm("Clear All Transactions", "This will delete all transaction records from all users. This cannot be undone.",
+      async () => {
+        const usersSnap = await getDocs(collection(db, "users"));
+        let count = 0;
+        for (const userDoc of usersSnap.docs) {
+          const txSnap = await getDocs(collection(db, "users", userDoc.id, "transactions"));
+          const batch = writeBatch(db);
+          txSnap.forEach(doc => batch.delete(doc.ref));
+          await batch.commit();
+          count += txSnap.size;
+        }
+        toast(`${count} transaction records cleared.`, "success");
+      });
+  });
+
+  document.getElementById("clearAllData").addEventListener("click", () => {
+    showConfirm("⚠️ Clear EVERYTHING", "This will delete ALL deposits, withdrawals, investments, and transactions. User accounts will remain. THIS CANNOT BE UNDONE.",
+      async () => {
+        let count = 0;
+        count += await clearCollection("deposits");
+        count += await clearCollection("withdrawals");
+        const usersSnap = await getDocs(collection(db, "users"));
+        for (const userDoc of usersSnap.docs) {
+          const uid = userDoc.id;
+          const invSnap = await getDocs(collection(db, "users", uid, "investments"));
+          const txSnap = await getDocs(collection(db, "users", uid, "transactions"));
+          const batch = writeBatch(db);
+          invSnap.forEach(doc => batch.delete(doc.ref));
+          txSnap.forEach(doc => batch.delete(doc.ref));
+          await batch.commit();
+          count += invSnap.size + txSnap.size;
+        }
+        toast(`✅ All data cleared (${count} records).`, "success");
+      });
+  });
+
+  // ── Auth Check ────────────────────────────────────
+  onAuthStateChanged(auth, async user => {
+    if (!user) { window.location.href = "admin-login.html"; return; }
+
+    const adminSnap = await getDoc(doc(db, "admins", user.uid));
+    if (!adminSnap.exists()) {
+      await signOut(auth);
+      window.location.href = "admin-login.html";
+      return;
+    }
+
+    const adminData = adminSnap.data();
+    document.getElementById("adminAvatar").textContent = (adminData.name || "A").charAt(0).toUpperCase();
+    document.getElementById("adminName").textContent = adminData.name || "Admin";
+
+    loadStats();
+  });
+
+  // ── Logout ────────────────────────────────────────
+  document.getElementById("logoutBtn").addEventListener("click", async () => {
+    sessionStorage.removeItem("covix_admin_cache");
+    await signOut(auth);
+    window.location.href = "admin-login.html";
+  });
+
+  console.log("🔐 Covix Admin Dashboard — Ready");
+</script>
+</body>
+</html>

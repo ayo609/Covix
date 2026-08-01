@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>COVIX — Investment Management</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #020510; --surface: #080d18; --surface-2: #0f1625; --surface-3: #161e30;
+    --primary: #7c3aed; --primary-light: #a78bfa; --primary-dark: #5b21b6;
+    --primary-glow: rgba(124,58,237,0.4); --accent: #06b6d4;
+    --text: #e2e8f0; --text-bright: #ffffff; --muted: #6b7280;
+    --success: #10b981; --warning: #f59e0b; --error: #ef4444;
+    --gold: #f59e0b; --border: rgba(255,255,255,0.06);
+    --shadow-card: 0 4px 32px rgba(0,0,0,0.5);
+    --radius-lg: 22px; --radius-md: 14px; --radius-pill: 50px; --radius-sm: 10px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'DM Sans', sans-serif; min-height: 100vh;
+    overflow-x: hidden; position: relative;
+  }
+  .bg-glow {
+    position: fixed; pointer-events: none; z-index: 0;
+    border-radius: 50%; filter: blur(80px); opacity: 0.15;
+  }
+  .glow-1 { width: 280px; height: 280px; background: rgba(245,158,11,0.1); top: -60px; right: -50px; }
+  .glow-2 { width: 220px; height: 220px; background: rgba(124,58,237,0.08); bottom: -50px; left: -40px; }
+
+  .page-container {
+    position: relative; z-index: 1; max-width: 1100px; margin: 0 auto;
+    padding: 20px 14px 100px; animation: fadeIn 0.5s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 12px; }
+  .back-btn {
+    display: flex; align-items: center; gap: 5px;
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: var(--radius-pill); padding: 9px 16px;
+    color: var(--muted); font-size: 12px; cursor: pointer;
+    text-decoration: none; transition: all 0.25s;
+  }
+  .back-btn:hover { border-color: var(--primary); color: #fff; }
+  .page-title { font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 700; color: var(--text-bright); }
+
+  /* Stats Row */
+  .stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 16px; }
+  .stat-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 14px; text-align: center;
+  }
+  .stat-card .stat-icon { font-size: 20px; margin-bottom: 6px; }
+  .stat-value { font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 700; color: var(--text-bright); }
+  .stat-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+
+  /* Filter Tabs */
+  .filter-tabs { display: flex; gap: 4px; margin-bottom: 16px; }
+  .filter-tab {
+    flex: 1; padding: 10px; text-align: center; cursor: pointer;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-pill); font-size: 11px; font-weight: 600;
+    color: var(--muted); transition: all 0.2s; font-family: 'Space Grotesk', sans-serif;
+  }
+  .filter-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .filter-tab .count { margin-left: 4px; opacity: 0.7; font-size: 10px; }
+
+  /* Search */
+  .search-bar { margin-bottom: 16px; }
+  .search-input {
+    width: 100%; background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: var(--radius-pill); padding: 12px 18px;
+    color: var(--text-bright); font-size: 13px; font-family: 'DM Sans', sans-serif;
+    outline: none; transition: all 0.25s;
+  }
+  .search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(124,58,237,0.1); }
+  .search-input::placeholder { color: #4b5563; }
+
+  /* Investment Cards */
+  .investments-list { display: flex; flex-direction: column; gap: 8px; }
+  .investment-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 16px;
+    transition: all 0.25s;
+  }
+  .investment-card:hover { border-color: var(--primary); }
+  .inv-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+  .inv-user { display: flex; align-items: center; gap: 10px; }
+  .inv-avatar {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold), var(--primary));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; color: #fff; flex: none;
+  }
+  .inv-user-name { font-weight: 600; color: var(--text-bright); font-size: 13px; }
+  .inv-username { font-size: 10px; color: var(--muted); }
+  .inv-plan-badge {
+    padding: 4px 12px; border-radius: var(--radius-pill);
+    font-size: 10px; font-weight: 700; font-family: 'Space Grotesk', sans-serif;
+  }
+  .inv-plan-badge.active { background: rgba(16,185,129,0.15); color: var(--success); }
+  .inv-plan-badge.completed { background: rgba(6,182,212,0.15); color: var(--accent); }
+
+  .inv-details-grid {
+    display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 10px;
+  }
+  .inv-detail {
+    background: var(--surface-2); border-radius: 8px; padding: 8px; text-align: center;
+  }
+  .inv-detail-value { font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 700; color: var(--text-bright); }
+  .inv-detail-value.green { color: var(--success); }
+  .inv-detail-value.gold { color: var(--gold); }
+  .inv-detail-label { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.3px; }
+
+  /* Progress Bar */
+  .inv-progress-wrap { margin-top: 4px; }
+  .inv-progress-bar {
+    width: 100%; height: 5px; background: var(--surface-2);
+    border-radius: 3px; overflow: hidden;
+  }
+  .inv-progress-fill {
+    height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent));
+    border-radius: 3px; transition: width 0.5s ease;
+  }
+  .inv-progress-text {
+    display: flex; justify-content: space-between;
+    font-size: 10px; color: var(--muted); margin-top: 4px;
+  }
+
+  .empty-state { text-align: center; padding: 40px; background: var(--surface); border-radius: var(--radius-md); }
+  .empty-state svg { width: 40px; height: 40px; color: var(--muted); margin-bottom: 8px; }
+  .empty-state p { color: var(--muted); font-size: 13px; }
+
+  .toast-zone { position: fixed; top: 16px; right: 16px; z-index: 200; display: flex; flex-direction: column; gap: 8px; width: calc(100% - 32px); max-width: 380px; }
+  .toast-item { background: var(--surface-3); border: 1px solid var(--border); padding: 12px 14px; border-radius: var(--radius-md); font-size: 12px; box-shadow: var(--shadow-card); animation: toastSlide 0.4s ease; display: flex; align-items: center; gap: 8px; font-weight: 500; }
+  .toast-item.error { border-left: 4px solid var(--error); }
+  .toast-item.success { border-left: 4px solid var(--success); }
+  .toast-emoji { font-size: 15px; flex: none; }
+  @keyframes toastSlide { from { opacity: 0; transform: translateX(80px); } to { opacity: 1; transform: translateX(0); } }
+
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--surface); border-top: 1px solid var(--border);
+    display: flex; justify-content: space-around;
+    padding: 8px 0 env(safe-area-inset-bottom,8px);
+    z-index: 100; box-shadow: 0 -5px 25px rgba(0,0,0,0.4);
+  }
+  .nav-item {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    color: var(--muted); text-decoration: none; font-size: 9px; font-weight: 600;
+    padding: 5px 12px; border-radius: 50px; transition: all 0.25s;
+  }
+  .nav-item.active { color: #dc2626; }
+  .nav-item svg { width: 18px; height: 18px; }
+
+  @media (max-width: 768px) {
+    .stats-row { grid-template-columns: repeat(2,1fr); }
+    .inv-details-grid { grid-template-columns: repeat(2,1fr); }
+  }
+  @media (max-width: 480px) {
+    .inv-details-grid { grid-template-columns: 1fr 1fr; }
+    .inv-top { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-glow glow-1"></div>
+<div class="bg-glow glow-2"></div>
+<div class="toast-zone" id="toastZone"></div>
+
+<div class="page-container">
+  <div class="top-bar">
+    <a href="admin-dashboard.html" class="back-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>
+      Back
+    </a>
+    <span class="page-title">Investment Management</span>
+    <button class="back-btn" id="refreshBtn" style="font-size:16px;">🔄</button>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon">📈</div>
+      <div class="stat-value" id="totalActive">0</div>
+      <div class="stat-label">Active Plans</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">✅</div>
+      <div class="stat-value" id="totalCompleted">0</div>
+      <div class="stat-label">Completed</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">💰</div>
+      <div class="stat-value" id="totalInvested">₦0</div>
+      <div class="stat-label">Total Invested</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">👥</div>
+      <div class="stat-value" id="totalInvestors">0</div>
+      <div class="stat-label">Investors</div>
+    </div>
+  </div>
+
+  <!-- Filter Tabs -->
+  <div class="filter-tabs" id="filterTabs">
+    <div class="filter-tab active" data-filter="all">All <span class="count" id="countAll">0</span></div>
+    <div class="filter-tab" data-filter="active">Active <span class="count" id="countActive">0</span></div>
+    <div class="filter-tab" data-filter="completed">Completed <span class="count" id="countCompleted">0</span></div>
+  </div>
+
+  <!-- Search -->
+  <div class="search-bar">
+    <input type="text" class="search-input" id="searchInput" placeholder="Search by username, plan name, or email...">
+  </div>
+
+  <!-- Investments List -->
+  <div class="investments-list" id="investmentsList">
+    <div class="empty-state"><p>Loading investments...</p></div>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <a href="admin-dashboard.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+  <a href="admin-users.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/></svg>Users</a>
+  <a href="admin-deposits.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Deposits</a>
+  <a href="admin-withdrawals.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12h14"/></svg>Withdrawals</a>
+  <a href="admin-settings.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/></svg>Settings</a>
+</nav>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { getFirestore, doc, getDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBjANH3YIecQIuVh4KOrHSA2JSVE0MVFdw",
+    authDomain: "covix-1f7d2.firebaseapp.com",
+    projectId: "covix-1f7d2",
+    storageBucket: "covix-1f7d2.firebasestorage.app",
+    messagingSenderId: "550748233984",
+    appId: "1:550748233984:web:ff2a36a3f601731a4ad3e5"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  let allInvestments = [];
+  let userCache = {};
+  let currentFilter = "all";
+
+  function toast(msg, type = "info") {
+    const zone = document.getElementById("toastZone");
+    const item = document.createElement("div");
+    item.className = `toast-item ${type}`;
+    const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+    item.innerHTML = `<span class="toast-emoji">${icons[type]||icons.info}</span>${msg}`;
+    if (zone.children.length >= 3) zone.removeChild(zone.firstChild);
+    zone.appendChild(item);
+    setTimeout(() => { item.style.opacity="0"; item.style.transform="translateX(80px)"; item.style.transition="all 0.3s"; setTimeout(() => item.remove(), 300); }, 4000);
+  }
+
+  function fmtN(n) { return "₦" + Number(n||0).toLocaleString("en-NG"); }
+  function fmtDate(ts) {
+    if (!ts) return "N/A";
+    return new Date(ts.seconds*1000).toLocaleDateString("en-NG", { day:"numeric", month:"short", year:"numeric" });
+  }
+
+  // ── Load All Investments ──────────────────────────
+  async function loadInvestments() {
+    const list = document.getElementById("investmentsList");
+    list.innerHTML = `<div class="empty-state"><p>Loading investments...</p></div>`;
+
+    try {
+      allInvestments = [];
+      userCache = {};
+
+      // Get all users
+      const usersSnap = await getDocs(collection(db, "users"));
+      
+      // Build user cache
+      usersSnap.forEach(doc => {
+        userCache[doc.id] = doc.data();
+      });
+
+      // Fetch investments for each user
+      for (const [uid, userData] of Object.entries(userCache)) {
+        try {
+          const invSnap = await getDocs(collection(db, "users", uid, "investments"));
+          invSnap.forEach(doc => {
+            if (doc.id === "active_list") return; // Skip the active_list document
+            allInvestments.push({
+              id: doc.id,
+              uid,
+              userName: userData.name || "Unknown",
+              userUsername: userData.username || "unknown",
+              userEmail: userData.email || "N/A",
+              ...doc.data()
+            });
+          });
+        } catch (err) {
+          console.error(`Error loading investments for ${uid}:`, err);
+        }
+      }
+
+      // Sort by creation date (newest first)
+      allInvestments.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+      console.log(`📊 Loaded ${allInvestments.length} investments from ${Object.keys(userCache).length} users`);
+
+      updateStats();
+      renderList();
+
+    } catch (err) {
+      console.error("Load error:", err);
+      list.innerHTML = `<div class="empty-state"><p style="color:var(--error);">Failed to load investments.</p></div>`;
+    }
+  }
+
+  function updateStats() {
+    const active = allInvestments.filter(i => i.active);
+    const completed = allInvestments.filter(i => !i.active);
+    const totalInvested = allInvestments.reduce((sum, i) => sum + (i.amount || 0), 0);
+    const uniqueInvestors = new Set(allInvestments.map(i => i.uid)).size;
+
+    document.getElementById("totalActive").textContent = active.length;
+    document.getElementById("totalCompleted").textContent = completed.length;
+    document.getElementById("totalInvested").textContent = fmtN(totalInvested);
+    document.getElementById("totalInvestors").textContent = uniqueInvestors;
+
+    document.getElementById("countAll").textContent = allInvestments.length;
+    document.getElementById("countActive").textContent = active.length;
+    document.getElementById("countCompleted").textContent = completed.length;
+  }
+
+  function renderList() {
+    const searchQuery = document.getElementById("searchInput").value.toLowerCase();
+    let filtered = allInvestments;
+
+    // Apply status filter
+    if (currentFilter === "active") {
+      filtered = filtered.filter(i => i.active);
+    } else if (currentFilter === "completed") {
+      filtered = filtered.filter(i => !i.active);
+    }
+
+    // Apply search
+    if (searchQuery) {
+      filtered = filtered.filter(i =>
+        (i.userName || "").toLowerCase().includes(searchQuery) ||
+        (i.userUsername || "").toLowerCase().includes(searchQuery) ||
+        (i.userEmail || "").toLowerCase().includes(searchQuery) ||
+        (i.planName || "").toLowerCase().includes(searchQuery)
+      );
+    }
+
+    const list = document.getElementById("investmentsList");
+
+    if (!filtered.length) {
+      list.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg><p>No investments found.</p></div>`;
+      return;
+    }
+
+    list.innerHTML = filtered.map(inv => {
+      const daysElapsed = inv.daysElapsed || 0;
+      const totalDays = inv.duration || 40;
+      const progressPercent = Math.round((daysElapsed / totalDays) * 100);
+      const isActive = inv.active === true;
+
+      return `
+        <div class="investment-card">
+          <!-- Top Row: User + Plan Badge -->
+          <div class="inv-top">
+            <div class="inv-user">
+              <div class="inv-avatar">${(inv.userName || "U").charAt(0).toUpperCase()}</div>
+              <div>
+                <div class="inv-user-name">${inv.userName || "Unknown"}</div>
+                <div class="inv-username">@${inv.userUsername || "user"} · ${inv.userEmail || "N/A"}</div>
+              </div>
+            </div>
+            <span class="inv-plan-badge ${isActive ? 'active' : 'completed'}">${isActive ? '🟢 Active' : '🔵 Completed'}</span>
+          </div>
+
+          <!-- Details Grid -->
+          <div class="inv-details-grid">
+            <div class="inv-detail">
+              <div class="inv-detail-value">${inv.planName || "N/A"}</div>
+              <div class="inv-detail-label">Plan</div>
+            </div>
+            <div class="inv-detail">
+              <div class="inv-detail-value green">${fmtN(inv.amount)}</div>
+              <div class="inv-detail-label">Invested</div>
+            </div>
+            <div class="inv-detail">
+              <div class="inv-detail-value gold">${fmtN(inv.dailyEarning)}</div>
+              <div class="inv-detail-label">Daily ROI</div>
+            </div>
+            <div class="inv-detail">
+              <div class="inv-detail-value">${fmtN(inv.totalEarned || 0)}</div>
+              <div class="inv-detail-label">Earned So Far</div>
+            </div>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="inv-progress-wrap">
+            <div class="inv-progress-bar">
+              <div class="inv-progress-fill" style="width:${progressPercent}%;"></div>
+            </div>
+            <div class="inv-progress-text">
+              <span>Day ${daysElapsed} / ${totalDays}</span>
+              <span>${progressPercent}% Complete</span>
+              <span>Started: ${fmtDate(inv.createdAt)}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  // ── Filter Tabs ───────────────────────────────────
+  document.getElementById("filterTabs").addEventListener("click", e => {
+    const tab = e.target.closest(".filter-tab");
+    if (!tab) return;
+    document.querySelectorAll(".filter-tab").forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    currentFilter = tab.dataset.filter;
+    renderList();
+  });
+
+  // ── Search ────────────────────────────────────────
+  document.getElementById("searchInput").addEventListener("input", renderList);
+
+  // ── Refresh ───────────────────────────────────────
+  document.getElementById("refreshBtn").addEventListener("click", loadInvestments);
+
+  // ── Auth ──────────────────────────────────────────
+  onAuthStateChanged(auth, async user => {
+    if (!user) { window.location.href = "admin-login.html"; return; }
+    const adminSnap = await getDoc(doc(db, "admins", user.uid));
+    if (!adminSnap.exists()) { await signOut(auth); window.location.href = "admin-login.html"; return; }
+    loadInvestments();
+  });
+
+  console.log("📈 Covix Admin Investments — Ready");
+</script>
+</body>
+</html>

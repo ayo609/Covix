@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>COVIX — Withdraw</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #030712; --surface: #0a0f1a; --surface-2: #111827; --surface-3: #1a2332;
+    --primary: #7c3aed; --primary-light: #a78bfa; --primary-dark: #5b21b6;
+    --primary-glow: rgba(124,58,237,0.35); --accent: #06b6d4;
+    --accent-glow: rgba(6,182,212,0.3); --text: #e2e8f0; --text-bright: #ffffff;
+    --muted: #6b7280; --success: #10b981; --warning: #f59e0b; --error: #ef4444;
+    --gold: #f59e0b; --border: rgba(255,255,255,0.06);
+    --shadow-card: 0 4px 32px rgba(0,0,0,0.5);
+    --radius-lg: 24px; --radius-md: 14px; --radius-pill: 50px; --radius-sm: 10px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'DM Sans', sans-serif; min-height: 100vh;
+    overflow-x: hidden; position: relative;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .bg-glow {
+    position: fixed; pointer-events: none; z-index: 0;
+    border-radius: 50%; filter: blur(80px); opacity: 0.2;
+  }
+  .glow-1 { width: 250px; height: 250px; background: rgba(124,58,237,0.12); top: -60px; right: -50px; }
+  .glow-2 { width: 200px; height: 200px; background: rgba(6,182,212,0.08); bottom: -50px; left: -40px; }
+
+  .page-wrapper {
+    position: relative; z-index: 1; width: 100%; max-width: 500px;
+    padding: 20px; animation: fadeUp 0.5s ease;
+  }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+  .top-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+  .back-btn {
+    display: flex; align-items: center; gap: 5px;
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: var(--radius-pill); padding: 9px 16px;
+    color: var(--muted); font-size: 12px; cursor: pointer;
+    text-decoration: none; transition: all 0.25s;
+  }
+  .back-btn:hover { border-color: var(--primary); color: #fff; }
+  .page-title { font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 700; color: var(--text-bright); }
+
+  /* Wallet Display */
+  .wallet-display {
+    background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(6,182,212,0.08));
+    border: 1px solid rgba(124,58,237,0.2);
+    border-radius: var(--radius-md); padding: 16px 18px;
+    margin-bottom: 16px; text-align: center;
+  }
+  .wallet-display .balance-label {
+    font-size: 10px; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 4px;
+  }
+  .wallet-display .balance-amount {
+    font-family: 'Space Grotesk', sans-serif; font-size: 28px;
+    font-weight: 700; color: var(--text-bright);
+  }
+  .wallet-display .balance-sub {
+    font-size: 10px; color: var(--muted); margin-top: 4px;
+  }
+  .wallet-display .balance-sub span { color: var(--warning); }
+
+  /* Time Status */
+  .time-status {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 14px; border-radius: var(--radius-pill);
+    margin-bottom: 16px; font-size: 11px; font-weight: 600;
+  }
+  .time-status.open {
+    background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2);
+    color: var(--success);
+  }
+  .time-status.closed {
+    background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2);
+    color: var(--error);
+  }
+  .time-dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+  .time-status.open .time-dot { background: var(--success); box-shadow: 0 0 6px rgba(16,185,129,0.5); }
+  .time-status.closed .time-dot { background: var(--error); box-shadow: 0 0 6px rgba(239,68,68,0.5); }
+
+  /* Active Investment Check */
+  .invest-check {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 14px; border-radius: var(--radius-pill);
+    margin-bottom: 16px; font-size: 11px; font-weight: 600;
+  }
+  .invest-check.pass {
+    background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2);
+    color: var(--success);
+  }
+  .invest-check.fail {
+    background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2);
+    color: var(--error);
+  }
+
+  /* Main Card */
+  .withdraw-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 28px 22px;
+    box-shadow: var(--shadow-card);
+  }
+  .withdraw-card h2 {
+    font-family: 'Space Grotesk', sans-serif; font-size: 20px;
+    font-weight: 700; color: var(--text-bright); text-align: center; margin-bottom: 4px;
+  }
+  .withdraw-card .subtitle {
+    text-align: center; font-size: 12px; color: var(--muted); margin-bottom: 22px;
+  }
+
+  .form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 16px; }
+  .form-group label {
+    font-size: 10px; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.7px;
+    margin-left: 14px; font-family: 'Space Grotesk', sans-serif;
+  }
+  .form-group input, .form-group select {
+    width: 100%; background: var(--surface-2); border: 1.5px solid var(--border);
+    border-radius: var(--radius-pill); padding: 13px 18px;
+    color: var(--text-bright); font-size: 14px; font-family: 'DM Sans', sans-serif;
+    outline: none; transition: all 0.25s;
+  }
+  .form-group input::placeholder { color: #4b5563; }
+  .form-group input:focus, .form-group select:focus {
+    border-color: var(--primary); box-shadow: 0 0 0 4px rgba(124,58,237,0.12);
+  }
+  .form-group select {
+    appearance: none; cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%236b7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 16px center;
+    padding-right: 40px;
+  }
+  .form-group select option { background: var(--surface-2); color: var(--text); }
+  .hint-text { font-size: 10px; color: var(--muted); margin-left: 14px; }
+
+  /* Quick Amounts */
+  .amount-presets {
+    display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 4px;
+  }
+  .preset-btn {
+    padding: 10px; background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: var(--radius-pill); color: var(--muted);
+    font-family: 'Space Grotesk', sans-serif; font-size: 12px;
+    font-weight: 600; cursor: pointer; transition: all 0.2s;
+  }
+  .preset-btn:hover { border-color: var(--primary); color: var(--text-bright); }
+  .preset-btn.selected { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+  /* Summary Card */
+  .summary-card {
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 14px 16px; margin-bottom: 16px;
+  }
+  .summary-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 6px 0; font-size: 12px;
+  }
+  .summary-row:not(:last-child) { border-bottom: 1px solid var(--border); }
+  .summary-label { color: var(--muted); }
+  .summary-value { font-weight: 600; color: var(--text-bright); }
+  .summary-value.deduct { color: var(--error); }
+  .summary-value.final { color: var(--success); font-size: 14px; font-weight: 700; }
+
+  .submit-btn {
+    width: 100%; padding: 14px; border: none; border-radius: var(--radius-pill);
+    background: var(--primary); color: #fff;
+    font-family: 'Space Grotesk', sans-serif; font-size: 14px;
+    font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all 0.3s; box-shadow: 0 8px 28px var(--primary-glow);
+  }
+  .submit-btn:hover:not(:disabled) { background: var(--primary-dark); }
+  .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .spinner {
+    width: 17px; height: 17px; border-radius: 50%;
+    border: 2.5px solid rgba(255,255,255,0.3);
+    border-top-color: #fff; animation: spin 0.7s linear infinite;
+    display: none;
+  }
+  .submit-btn.loading .spinner { display: inline-block; }
+  .submit-btn.loading .btn-text { display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Success Modal */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(3,7,18,0.9); backdrop-filter: blur(8px);
+    display: none; align-items: center; justify-content: center;
+    z-index: 150; padding: 20px;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal-dialog {
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 30px 24px;
+    max-width: 400px; width: 100%; text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+    animation: popIn 0.4s cubic-bezier(0.68,-0.55,0.265,1.55);
+  }
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.85) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .modal-dialog .check-circle {
+    width: 60px; height: 60px; border-radius: 50%;
+    margin: 0 auto 14px; display: flex; align-items: center; justify-content: center;
+    background: rgba(16,185,129,0.12); border: 2px solid rgba(16,185,129,0.3);
+  }
+  .modal-dialog .check-circle svg { color: var(--success); width: 28px; height: 28px; }
+  .modal-dialog h3 { font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+  .modal-dialog p { color: var(--muted); font-size: 13px; line-height: 1.5; margin-bottom: 18px; }
+  .modal-btn {
+    width: 100%; padding: 13px; border: none; border-radius: var(--radius-pill);
+    background: var(--primary); color: #fff;
+    font-family: 'Space Grotesk', sans-serif; font-size: 14px;
+    font-weight: 700; cursor: pointer; transition: all 0.3s;
+  }
+  .modal-btn:hover { background: var(--primary-dark); }
+
+  .toast-zone { position: fixed; top: 16px; right: 16px; z-index: 200; display: flex; flex-direction: column; gap: 8px; width: calc(100% - 32px); max-width: 380px; }
+  .toast-item { background: var(--surface-3); border: 1px solid var(--border); padding: 12px 14px; border-radius: var(--radius-md); font-size: 12px; box-shadow: var(--shadow-card); animation: toastSlide 0.4s ease; display: flex; align-items: center; gap: 8px; font-weight: 500; }
+  .toast-item.error { border-left: 4px solid var(--error); }
+  .toast-item.success { border-left: 4px solid var(--success); }
+  .toast-emoji { font-size: 15px; flex: none; }
+  @keyframes toastSlide { from { opacity: 0; transform: translateX(80px); } to { opacity: 1; transform: translateX(0); } }
+
+  @media (max-width: 420px) {
+    .page-wrapper { padding: 12px; }
+    .withdraw-card { padding: 22px 14px; }
+    .wallet-display .balance-amount { font-size: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-glow glow-1"></div>
+<div class="bg-glow glow-2"></div>
+<div class="toast-zone" id="toastZone"></div>
+
+<div class="page-wrapper">
+  <div class="top-bar">
+    <a href="dashboard.html" class="back-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>
+      Back
+    </a>
+    <span class="page-title">Withdraw</span>
+  </div>
+
+  <!-- Wallet Display -->
+  <div class="wallet-display">
+    <div class="balance-label">Withdrawal Wallet</div>
+    <div class="balance-amount" id="withdrawBalance">₦0</div>
+    <div class="balance-sub">Min withdrawal: ₦1,500 | Fee: <span>15%</span></div>
+  </div>
+
+  <!-- Time Status -->
+  <div class="time-status open" id="timeStatus">
+    <span class="time-dot"></span>
+    <span id="timeStatusText">Checking withdrawal hours...</span>
+  </div>
+
+  <!-- Active Investment Check -->
+  <div class="invest-check pass" id="investCheck">
+    <span id="investCheckText">Checking investment status...</span>
+  </div>
+
+  <!-- Withdraw Card -->
+  <div class="withdraw-card">
+    <h2>Request Withdrawal</h2>
+    <p class="subtitle">Enter amount and bank details</p>
+
+    <form id="withdrawForm" novalidate>
+      <!-- Amount -->
+      <div class="form-group">
+        <label for="amount">Amount (₦)</label>
+        <div class="amount-presets" id="presetBtns">
+          <button type="button" class="preset-btn" data-amount="2000">₦2,000</button>
+          <button type="button" class="preset-btn" data-amount="5000">₦5,000</button>
+          <button type="button" class="preset-btn" data-amount="10000">₦10,000</button>
+          <button type="button" class="preset-btn" data-amount="20000">₦20,000</button>
+          <button type="button" class="preset-btn" data-amount="50000">₦50,000</button>
+          <button type="button" class="preset-btn" data-amount="100000">₦100,000</button>
+        </div>
+        <input type="number" id="amount" placeholder="Or enter custom amount" min="1500" step="100">
+        <span class="hint-text">Minimum withdrawal: ₦1,500</span>
+      </div>
+
+      <!-- Summary -->
+      <div class="summary-card" id="summaryCard" style="display:none;">
+        <div class="summary-row">
+          <span class="summary-label">Withdrawal Amount</span>
+          <span class="summary-value" id="sumAmount">₦0</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Fee (15%)</span>
+          <span class="summary-value deduct" id="sumFee">-₦0</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">You'll Receive</span>
+          <span class="summary-value final" id="sumFinal">₦0</span>
+        </div>
+      </div>
+
+      <!-- Bank Name -->
+      <div class="form-group">
+        <label for="bankName">Bank Name</label>
+        <select id="bankName" required>
+          <option value="">Select Bank</option>
+          <option value="Access Bank">Access Bank</option>
+          <option value="First Bank">First Bank</option>
+          <option value="GTBank">GTBank</option>
+          <option value="UBA">UBA</option>
+          <option value="Zenith Bank">Zenith Bank</option>
+          <option value="Kuda Bank">Kuda Bank</option>
+          <option value="Opay">Opay</option>
+          <option value="PalmPay">PalmPay</option>
+          <option value="Fidelity Bank">Fidelity Bank</option>
+          <option value="Union Bank">Union Bank</option>
+          <option value="Stanbic IBTC">Stanbic IBTC</option>
+          <option value="Ecobank">Ecobank</option>
+          <option value="Heritage Bank">Heritage Bank</option>
+          <option value="Polaris Bank">Polaris Bank</option>
+          <option value="Wema Bank">Wema Bank</option>
+        </select>
+      </div>
+
+      <!-- Account Number -->
+      <div class="form-group">
+        <label for="accountNumber">Account Number</label>
+        <input type="text" id="accountNumber" placeholder="Enter 10-digit account number" maxlength="10" inputmode="numeric" required>
+      </div>
+
+      <!-- Account Name -->
+      <div class="form-group">
+        <label for="accountName">Account Name</label>
+        <input type="text" id="accountName" placeholder="Name on the account" required>
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" class="submit-btn" id="submitBtn" disabled>
+        <span class="btn-text">Request Withdrawal</span>
+        <span class="spinner"></span>
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal-overlay" id="successModal">
+  <div class="modal-dialog">
+    <div class="check-circle">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20,6 9,17 4,12"/></svg>
+    </div>
+    <h3>Withdrawal Submitted!</h3>
+    <p id="successMsg">Your withdrawal request has been submitted successfully. It will be processed shortly.</p>
+    <button class="modal-btn" onclick="window.location.href='transactions.html'">View Transactions</button>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBjANH3YIecQIuVh4KOrHSA2JSVE0MVFdw",
+    authDomain: "covix-1f7d2.firebaseapp.com",
+    projectId: "covix-1f7d2",
+    storageBucket: "covix-1f7d2.firebasestorage.app",
+    messagingSenderId: "550748233984",
+    appId: "1:550748233984:web:ff2a36a3f601731a4ad3e5"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const WITHDRAWAL_FEE = 0.15; // 15%
+  const MIN_WITHDRAWAL = 1500;
+  const WITHDRAWAL_START_HOUR = 8; // 8 AM
+  const WITHDRAWAL_END_HOUR = 17; // 5 PM
+
+  let currentUser = null;
+  let userData = null;
+  let canWithdraw = false;
+
+  function toast(msg, type = "info") {
+    const zone = document.getElementById("toastZone");
+    const item = document.createElement("div");
+    item.className = `toast-item ${type}`;
+    const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+    item.innerHTML = `<span class="toast-emoji">${icons[type]||icons.info}</span>${msg}`;
+    if (zone.children.length >= 3) zone.removeChild(zone.firstChild);
+    zone.appendChild(item);
+    setTimeout(() => { item.style.opacity="0"; item.style.transform="translateX(80px)"; item.style.transition="all 0.3s"; setTimeout(() => item.remove(), 300); }, 4000);
+  }
+
+  function fmtN(n) { return "₦" + Number(n||0).toLocaleString("en-NG"); }
+
+  // ── Check Withdrawal Eligibility ──────────────────
+  function isWithdrawalTimeOpen() {
+    const now = new Date();
+    const day = now.getDay(); // 0 = Sunday, 1-6 = Mon-Sat
+    const hour = now.getHours();
+
+    // Sundays are closed
+    if (day === 0) return { open: false, reason: "Withdrawals are not processed on Sundays." };
+
+    // Check if within 8AM-5PM
+    if (hour >= WITHDRAWAL_START_HOUR && hour < WITHDRAWAL_END_HOUR) {
+      return { open: true, reason: "" };
+    }
+
+    // Before 8AM
+    if (hour < WITHDRAWAL_START_HOUR) {
+      return { open: false, reason: `Withdrawals open from ${WITHDRAWAL_START_HOUR}:00 AM to ${WITHDRAWAL_END_HOUR}:00 PM.` };
+    }
+
+    // After 5PM
+    return { open: false, reason: `Withdrawal hours are ${WITHDRAWAL_START_HOUR}:00 AM to ${WITHDRAWAL_END_HOUR}:00 PM. Please try again tomorrow.` };
+  }
+
+  function hasActiveInvestment() {
+    return (userData?.activePlansCount || 0) > 0;
+  }
+
+  // ── Update Eligibility UI ─────────────────────────
+  function updateEligibility() {
+    const timeCheck = isWithdrawalTimeOpen();
+    const timeStatus = document.getElementById("timeStatus");
+    const timeText = document.getElementById("timeStatusText");
+    const investCheck = document.getElementById("investCheck");
+    const investText = document.getElementById("investCheckText");
+    const submitBtn = document.getElementById("submitBtn");
+
+    // Time check
+    if (timeCheck.open) {
+      timeStatus.className = "time-status open";
+      timeText.textContent = "Withdrawal window is open (8AM - 5PM)";
+    } else {
+      timeStatus.className = "time-status closed";
+      timeText.textContent = timeCheck.reason;
+    }
+
+    // Investment check
+    if (hasActiveInvestment()) {
+      investCheck.className = "invest-check pass";
+      investText.textContent = "✓ You have an active investment";
+    } else {
+      investCheck.className = "invest-check fail";
+      investText.textContent = "✗ You need an active investment to withdraw";
+    }
+
+    // Enable/disable submit
+    canWithdraw = timeCheck.open && hasActiveInvestment();
+    updateSubmitButton();
+  }
+
+  // ── Amount Presets ────────────────────────────────
+  const amountInput = document.getElementById("amount");
+  const summaryCard = document.getElementById("summaryCard");
+
+  document.getElementById("presetBtns").addEventListener("click", e => {
+    const btn = e.target.closest(".preset-btn");
+    if (!btn) return;
+    document.querySelectorAll(".preset-btn").forEach(b => b.classList.remove("selected"));
+    btn.classList.add("selected");
+    amountInput.value = btn.dataset.amount;
+    updateSummary();
+    updateSubmitButton();
+  });
+
+  amountInput.addEventListener("input", () => {
+    document.querySelectorAll(".preset-btn").forEach(b => b.classList.remove("selected"));
+    updateSummary();
+    updateSubmitButton();
+  });
+
+  // ── Update Summary ────────────────────────────────
+  function updateSummary() {
+    const amount = parseInt(amountInput.value) || 0;
+    if (amount < MIN_WITHDRAWAL) {
+      summaryCard.style.display = "none";
+      return;
+    }
+    summaryCard.style.display = "block";
+    const fee = Math.floor(amount * WITHDRAWAL_FEE);
+    const final = amount - fee;
+
+    document.getElementById("sumAmount").textContent = fmtN(amount);
+    document.getElementById("sumFee").textContent = "-" + fmtN(fee);
+    document.getElementById("sumFinal").textContent = fmtN(final);
+  }
+
+  // ── Update Submit Button ──────────────────────────
+  function updateSubmitButton() {
+    const btn = document.getElementById("submitBtn");
+    const amount = parseInt(amountInput.value) || 0;
+    const withdrawalWallet = userData?.withdrawalWallet || 0;
+    const bankName = document.getElementById("bankName").value;
+    const accountNumber = document.getElementById("accountNumber").value.trim();
+    const accountName = document.getElementById("accountName").value.trim();
+
+    const hasValidAmount = amount >= MIN_WITHDRAWAL && amount <= withdrawalWallet;
+    const hasBankDetails = bankName && accountNumber.length === 10 && accountName.length >= 3;
+
+    btn.disabled = !(canWithdraw && hasValidAmount && hasBankDetails);
+  }
+
+  // ── Attach Listeners for Bank Fields ──────────────
+  document.getElementById("bankName").addEventListener("change", updateSubmitButton);
+  document.getElementById("accountNumber").addEventListener("input", function() {
+    this.value = this.value.replace(/\D/g, "").slice(0, 10);
+    updateSubmitButton();
+  });
+  document.getElementById("accountName").addEventListener("input", updateSubmitButton);
+
+  // ── Form Submit ───────────────────────────────────
+  document.getElementById("withdrawForm").addEventListener("submit", async e => {
+    e.preventDefault();
+
+    if (!currentUser || !userData) {
+      toast("You must be logged in.", "error");
+      return;
+    }
+
+    // Re-validate
+    const timeCheck = isWithdrawalTimeOpen();
+    if (!timeCheck.open) {
+      toast(timeCheck.reason, "error");
+      return;
+    }
+
+    if (!hasActiveInvestment()) {
+      toast("You need an active investment to withdraw.", "error");
+      return;
+    }
+
+    const amount = parseInt(amountInput.value) || 0;
+    const withdrawalWallet = userData.withdrawalWallet || 0;
+
+    if (amount < MIN_WITHDRAWAL) {
+      toast(`Minimum withdrawal is ${fmtN(MIN_WITHDRAWAL)}`, "error");
+      return;
+    }
+
+    if (amount > withdrawalWallet) {
+      toast("Insufficient withdrawal wallet balance.", "error");
+      return;
+    }
+
+    const bankName = document.getElementById("bankName").value;
+    const accountNumber = document.getElementById("accountNumber").value.trim();
+    const accountName = document.getElementById("accountName").value.trim();
+
+    if (!bankName || accountNumber.length !== 10 || accountName.length < 3) {
+      toast("Please fill all bank details correctly.", "error");
+      return;
+    }
+
+    const submitBtn = document.getElementById("submitBtn");
+    submitBtn.disabled = true;
+    submitBtn.classList.add("loading");
+
+    try {
+      const uid = currentUser.uid;
+      const fee = Math.floor(amount * WITHDRAWAL_FEE);
+      const finalAmount = amount - fee;
+      const withdrawalId = "wdr_" + Date.now();
+      const now = Date.now();
+
+      // Deduct from withdrawal wallet
+      await updateDoc(doc(db, "users", uid), {
+        withdrawalWallet: increment(-amount),
+        totalWithdrawn: increment(finalAmount)
+      });
+
+      // Create withdrawal record
+      await setDoc(doc(db, "withdrawals", withdrawalId), {
+        uid,
+        username: userData.username || "unknown",
+        email: userData.email || "unknown",
+        amount,
+        fee,
+        finalAmount,
+        bankName,
+        accountNumber,
+        accountName,
+        status: "pending",
+        createdAt: serverTimestamp(),
+        processedAt: null
+      });
+
+      // Log transaction
+      await setDoc(doc(db, "users", uid, "transactions", withdrawalId), {
+        type: "withdrawal",
+        amount,
+        fee,
+        description: `Withdrawal to ${bankName} (${accountNumber})`,
+        status: "pending",
+        timestamp: serverTimestamp()
+      });
+
+      // Update recent tx cache
+      const txRef = doc(db, "users", uid, "transactions", "recent");
+      const txSnap = await getDoc(txRef);
+      let items = txSnap.exists() ? (txSnap.data().items || []) : [];
+      items.unshift({
+        type: "withdrawal",
+        amount,
+        description: `Withdrawal to ${bankName}`,
+        status: "pending",
+        timestamp: { seconds: Math.floor(now / 1000) }
+      });
+      if (items.length > 20) items = items.slice(0, 20);
+      await setDoc(txRef, { items });
+
+      // Update local data
+      userData.withdrawalWallet -= amount;
+      userData.totalWithdrawn = (userData.totalWithdrawn || 0) + finalAmount;
+      document.getElementById("withdrawBalance").textContent = fmtN(userData.withdrawalWallet);
+
+      // Reset form
+      document.getElementById("withdrawForm").reset();
+      document.querySelectorAll(".preset-btn").forEach(b => b.classList.remove("selected"));
+      summaryCard.style.display = "none";
+      updateSubmitButton();
+
+      // Show success
+      document.getElementById("successMsg").textContent = 
+        `Your withdrawal of ${fmtN(finalAmount)} (after 15% fee) has been submitted. It will be processed shortly.`;
+      document.getElementById("successModal").classList.add("show");
+
+    } catch (err) {
+      console.error("Withdrawal error:", err);
+      toast("Failed to process withdrawal. Try again.", "error");
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.classList.remove("loading");
+    }
+  });
+
+  // ── Auth & Init ───────────────────────────────────
+  onAuthStateChanged(auth, async user => {
+    if (!user) { window.location.href = "login.html"; return; }
+    currentUser = user;
+
+    try {
+      const snap = await getDoc(doc(db, "users", user.uid));
+      if (!snap.exists()) { toast("Account not found.", "error"); return; }
+      userData = snap.data();
+
+      document.getElementById("withdrawBalance").textContent = fmtN(userData.withdrawalWallet || 0);
+      updateEligibility();
+    } catch (err) {
+      console.error("Init error:", err);
+      toast("Failed to load account data.", "error");
+    }
+  });
+
+  console.log("⚡ Covix Withdrawal Page — Ready");
+</script>
+</body>
+</html>
